@@ -56,7 +56,7 @@ animal_GPS_data <- animal_GPS_data %>%
 
 ### filter data between two dates start and end of trial
 
-animal_GPS_data <- animal_GPS_data %>%  filter(local_time >= ymd_hms("2022-10-17 15:00:00", tz= "Australia/Adelaide"), #yyy-mm-dd hh:mm:ss
+animal_GPS_data <- animal_GPS_data %>%  filter(local_time >= ymd_hms("2022-10-17 08:00:00", tz= "Australia/Adelaide"), #yyy-mm-dd hh:mm:ss
                                                local_time <=  ymd_hms("2022-10-21 11:50:00", tz= "Australia/Adelaide"))
 
 animal_GPS_data <- animal_GPS_data %>% 
@@ -101,10 +101,10 @@ rm(animal_GPS_data,animal_GPS_data_sf )
 
 
 
-Lameroo_Vf_area_hard_fence_bound <- st_read("W:/VF/Sheep_Lameroo_2022/spatial_boundary/HF_Lameroo_rough.shp")  # this is the hard fences
+Lameroo_Vf_area_hard_fence_bound <- st_read("W:/VF/Sheep_Lameroo_2022/spatial_boundary/VF_working/HF_Lameroo_rough_proj.shp")  # this is the hard fences
 
-# Lameroo_paddock_area <-             st_read("W:/VF/Pinnaroo 2022/Spatial/pinnaroo_boundary_dGPS_proj.shp")
-# Lameroo_Vf_area <-                  st_read("W:/VF/Pinnaroo 2022/Spatial/VF/VF_display_modified/all_VF.shp")
+Lameroo_Vf_area <-                  st_read("W:/VF/Sheep_Lameroo_2022/spatial_boundary/VF_proj.shp")
+Lameroo_Vf_area_buffer_5 <-                  st_read("W:/VF/Sheep_Lameroo_2022/spatial_boundary/VF_Buffer_proj.shp")
 
 
 plot(Lameroo_Vf_area_hard_fence_bound)
@@ -114,8 +114,8 @@ plot(Lameroo_Vf_area)
 Lameroo_Vf_area_hard_fence_bound <-
   st_transform(Lameroo_Vf_area_hard_fence_bound, crs = 28354)
 
-Lameroo_paddock_area <-
-  st_transform(Lameroo_paddock_area, crs = 28354)
+Lameroo_Vf_area_buffer_5 <-
+  st_transform(Lameroo_Vf_area_buffer_5, crs = 28354)
 Lameroo_Vf_area <-
   st_transform(Lameroo_Vf_area, crs = 28354)
 
@@ -123,7 +123,8 @@ Lameroo_Vf_area <-
 
 ggplot() +
   geom_sf(data = Lameroo_Vf_area_hard_fence_bound, color = "black", fill = NA) +
-  #geom_sf(data = pinnaroo_Vf_area, color = "black", fill = NA) +
+  geom_sf(data = Lameroo_Vf_area, color = "black", fill = NA) +
+  geom_sf(data = Lameroo_Vf_area_buffer_5, color = "black", fill = NA) +
   #geom_sf(data = water_pts_sf ,color ="Blue") +
   geom_sf(data = animal_GPS_data_sf_trans ,alpha = 0.01) +
   theme_bw()+
@@ -135,10 +136,38 @@ ggplot() +
 
 
 
+names(animal_GPS_data_sf_trans)
 
 
 
-#### ----- Up to HERE ----- ######
+
+ggplot() +
+  geom_sf(data = Lameroo_Vf_area_hard_fence_bound, color = "black", fill = NA) +
+  geom_sf(data = Lameroo_Vf_area, color = "black", fill = NA) +
+  geom_sf(data = Lameroo_Vf_area_buffer_5, color = "black", fill = NA) +
+  #geom_sf(data = water_pts_sf ,color ="Blue") +
+  geom_sf(data = animal_GPS_data_sf_trans ,alpha = 0.01) +
+  theme_bw()+
+  theme(legend.position = "none",
+        axis.ticks = element_blank(), axis.text.x = element_blank(), axis.text.y = element_blank())+
+facet_wrap(. ~ date)
+
+unique(animal_GPS_data_sf_trans$date)
+GPS_data_sf_trans_17 <- animal_GPS_data_sf_trans %>% filter(date=="2022-10-17")
+
+
+#### ----- Up to HERE ----- ###### Need to work out what the start time is need to create new variable with time
+
+ggplot() +
+  geom_sf(data = Lameroo_Vf_area_hard_fence_bound, color = "black", fill = NA) +
+  geom_sf(data = Lameroo_Vf_area, color = "black", fill = NA) +
+  geom_sf(data = Lameroo_Vf_area_buffer_5, color = "black", fill = NA) +
+  #geom_sf(data = water_pts_sf ,color ="Blue") +
+  geom_sf(data = GPS_data_sf_trans_17 ,alpha = 1) +
+  theme_bw()+
+  theme(legend.position = "none",
+        axis.ticks = element_blank(), axis.text.x = element_blank(), axis.text.y = element_blank())
+
 
 ################################################################
 ###               Clip to the VF hard fences           #########
