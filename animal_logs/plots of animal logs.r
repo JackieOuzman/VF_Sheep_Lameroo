@@ -54,7 +54,6 @@ ggplot() +
 
 
 
-### also need to find out where the north water point is.
 
 
 #### I would like to display the audio and pulse records as another coloured dots
@@ -67,18 +66,67 @@ shock_records_only <- animal_logs_sf %>%
   filter(Shock_values > 0)
 
 ggplot() +
-  geom_sf(data = pinnaroo_paddock_area, color = "black", fill = NA) +
-  geom_sf(data = pinnaroo_Vf_area, color = "black", fill = NA) +
-  geom_sf(data = water_pts_sf ,color ="Blue") +
+  geom_sf(data = Lameroo_Vf_area_hard_fence_bound, color = "black", fill = NA) +
+  geom_sf(data = Lameroo_Vf_area, color = "black", fill = NA) +
+  
+  geom_sf(data = Lameroo_Vf_area_hard_fence_bound_buff, color = "grey", fill = NA) +
+  geom_sf(data = Lameroo_Vf_area_buffer_10, color = "grey", fill = NA) +
+  
+  geom_sf(data = water_pt ,color ="Blue") +
   #geom_sf(data = audio_records_only ,color ="Red",alpha = 0.01) +
   geom_sf(data = audio_records_only ,color ="Pink") +
   geom_sf(data = animal_logs_sf ,alpha = 0.01) +
   theme_bw()+
   theme(#legend.position = "none",
         axis.ticks = element_blank(), axis.text.x = element_blank(), axis.text.y = element_blank())+
-  facet_wrap(. ~ Jax_fence_ID)+
+  facet_wrap(. ~ date)+
   labs(
-    title = "Pinnaroo VF 2020 aniamal logs",
-    subtitle = "VF Fences are faceted. Balck dots are GPS pts and pink are GPS records with pulse cues only"
+    title = "Lameroo VF 2020 aniamal logs (non training)",
+    subtitle = "Dates are faceted. \nBalck dots are GPS pts and pink are GPS records with pulse cues only. \nGrey is 10m buffer"
     #y = "", x = ""
     )
+
+
+### whats happening with sheep 2 is it ok? yip I think so
+
+
+animal_logs_sf_sheep2 <- animal_logs_sf %>% 
+  filter(Sheep_ID == 2)
+
+ggplot() +
+  geom_sf(data = Lameroo_Vf_area_hard_fence_bound, color = "black", fill = NA) +
+  geom_sf(data = Lameroo_Vf_area, color = "black", fill = NA) +
+  
+  geom_sf(data = Lameroo_Vf_area_hard_fence_bound_buff, color = "grey", fill = NA) +
+  geom_sf(data = Lameroo_Vf_area_buffer_10, color = "grey", fill = NA) +
+  
+  geom_sf(data = water_pt ,color ="Blue") +
+  #geom_sf(data = audio_records_only ,color ="Red",alpha = 0.01) +
+  geom_sf(data = audio_records_only ,color ="Pink") +
+  geom_sf(data = animal_logs_sf_sheep2 ,alpha = 0.01) +
+  theme_bw()+
+  theme(#legend.position = "none",
+    axis.ticks = element_blank(), axis.text.x = element_blank(), axis.text.y = element_blank())+
+  facet_wrap(. ~ date)+
+  labs(
+    title = "Lameroo VF 2020 aniamal logs (non training)",
+    subtitle = "Dates are faceted. \nBalck dots are GPS pts and pink are GPS records with pulse cues only. \nGrey is 10m buffer"
+    #y = "", x = ""
+  )
+
+
+summary_nonTraining <- read_csv(paste0(path_output_files,
+                               "summary_nonTrain.csv"))
+names(summary_nonTraining)
+
+summary_nonTraining %>%
+  ggplot(aes(x = date , y = ratio)) +
+  geom_col()+
+  theme_classic() +
+  facet_wrap(.~ Sheep_ID)+
+  # theme(axis.text.x = element_blank(),
+  #       axis.ticks.x=element_blank())+
+  labs(
+    title = "Lameroo VF Sheep - cue data for non training period",
+    x = "Dates",
+    y = "ratio audio / (pulse + audio) * 100")

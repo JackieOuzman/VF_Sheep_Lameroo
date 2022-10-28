@@ -130,6 +130,10 @@ rm( temp_490705,
   )
 
 
+
+
+
+
 path_output_files
 write.csv(Fence_all, 
           paste0(path_output_files,"/animal_GPS_data_nonTrain_step1_2.csv"), 
@@ -143,3 +147,22 @@ check <-
                        Shock_values, 
                        local_time ,  
                        Sheep_ID   )
+
+
+################################################################################
+## per animal per day what is the total (sum) and then what is the ratio
+names(Fence_all)
+
+non_train_summary <-  Fence_all %>% 
+  group_by(Sheep_ID, date) %>% 
+  summarise(sum_aduio = sum(Audio_values, na.rm = TRUE),
+            sum_pulse = sum(Shock_values, na.rm = TRUE),
+            ratio = (sum_aduio/(sum_pulse+ sum_aduio))*100)
+non_train_summary$ratio <-   round(non_train_summary$ratio ,2)
+
+non_train_summary$ratio [is.nan(non_train_summary$ratio )]<-NA
+
+
+write.csv(non_train_summary, 
+          paste0(path_output_files,"/summary_nonTrain.csv"), 
+          row.names=FALSE)

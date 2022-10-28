@@ -382,7 +382,7 @@ ggplot() +
 
 #To the large block boundary
 animals_GPS_trim_time_clip <-
-  st_intersection(animals_GPS_trim_time, Lameroo_Vf_area_buffer_10)
+  st_intersection(animals_GPS_trim_time, Lameroo_Vf_area_hard_fence_bound_buff)
 
 
 ## remove all the rows that don't have fence ID
