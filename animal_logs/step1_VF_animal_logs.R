@@ -67,7 +67,7 @@ animal_GPS_data <- animal_GPS_data %>%
   ))
 
 #remove sheep 2 records
-animal_GPS_data <- animal_GPS_data %>% 
+animal_GPS_data_no2 <- animal_GPS_data %>% 
   filter(Sheep_ID != "2" )
 
 #subset data keep only sheep 2 records
@@ -76,18 +76,18 @@ animal_2 <- animal_GPS_data %>%
 
 #filter out time sheep 2 used each device
 animal_1390826 <- animal_2 %>% 
-  filter( deviceName == 1390826 ) %>% 
+  filter( deviceName == "1390826" ) %>% 
   filter(local_time <=  ymd_hms("2022-10-18 10:30:00", tz= "Australia/Adelaide")) 
 
 animal_1391505 <- animal_2 %>% 
-  filter( deviceName == 1391505 ) %>% 
+  filter( deviceName == "1391505" ) %>% 
   filter(local_time >=  ymd_hms("2022-10-18 10:30:00", tz= "Australia/Adelaide")) 
 
 
 animal_2 <- rbind(animal_1390826,animal_1391505 )
 
-animal_GPS_data <- rbind (animal_GPS_data , animal_2)
-rm(animal_2, animal_1390826,animal_1391505 )
+animal_GPS_data <- rbind (animal_GPS_data_no2 , animal_2 )
+rm(animal_2, animal_1390826,animal_1391505, animal_GPS_data_no2 )
 
 ############################################################################################
 ############                  Turn into spatial data          ##############################
@@ -128,7 +128,7 @@ Lameroo_Vf_area <-                  st_read("W:/VF/Sheep_Lameroo_2022/spatial_bo
 Lameroo_Vf_area_buffer_10 <-                  st_read("W:/VF/Sheep_Lameroo_2022/spatial_boundary/VF_Buffer10_proj.shp")
 water_pt <-  st_read("W:/VF/Sheep_Lameroo_2022/spatial_boundary/water_pts.shp")
 
-HF_Lameroo_rough_10_proj.shp
+
 
 
 
