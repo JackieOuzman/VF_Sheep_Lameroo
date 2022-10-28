@@ -44,10 +44,50 @@ animal_GPS_data <- animal_GPS_data %>%
          DOY = yday(date))
 
 
+#############################################################################################
+####    Assign collar to sheep names #####
+unique(animal_GPS_data$deviceName)
+
+animal_GPS_data <- animal_GPS_data %>% 
+  mutate(Sheep_ID = case_when(
+    deviceName == 1390743 ~ "10",#was called blank
+    deviceName == 1390581 ~ "1",
+    deviceName == 1390826 ~ "2", #before 18/10 I assume at 10:30
+    deviceName == 1391505 ~ "2", #after 18/10 I assume at 10:30
+    deviceName == 0490705 ~ "3",
+    deviceName == 1390577 ~ "4",
+    deviceName == 1390737 ~ "5",
+    deviceName == 1390749 ~ "6",
+    deviceName == 1390456 ~ "7",
+    deviceName == 1390182 ~ "8",
+    deviceName == 1390736 ~ "9",
+    deviceName == 1390189 ~ "water_pt",
+    TRUE                      ~ "other"
+    
+  ))
+
+#remove sheep 2 records
+animal_GPS_data <- animal_GPS_data %>% 
+  filter(Sheep_ID != "2" )
+
+#subset data keep only sheep 2 records
+animal_2 <- animal_GPS_data %>% 
+  filter(Sheep_ID == "2" ) 
+
+#filter out time sheep 2 used each device
+animal_1390826 <- animal_2 %>% 
+  filter( deviceName == 1390826 ) %>% 
+  filter(local_time <=  ymd_hms("2022-10-18 10:30:00", tz= "Australia/Adelaide")) 
+
+animal_1391505 <- animal_2 %>% 
+  filter( deviceName == 1391505 ) %>% 
+  filter(local_time >=  ymd_hms("2022-10-18 10:30:00", tz= "Australia/Adelaide")) 
 
 
+animal_2 <- rbind(animal_1390826,animal_1391505 )
 
-
+animal_GPS_data <- rbind (animal_GPS_data , animal_2)
+rm(animal_2, animal_1390826,animal_1391505 )
 
 ############################################################################################
 ############                  Turn into spatial data          ##############################
@@ -82,42 +122,47 @@ rm(animal_GPS_data,animal_GPS_data_sf )
 
 
 Lameroo_Vf_area_hard_fence_bound <- st_read("W:/VF/Sheep_Lameroo_2022/spatial_boundary/VF_working/HF_Lameroo_rough_proj.shp")  # this is the hard fences
+Lameroo_Vf_area_hard_fence_bound_buff <- st_read("W:/VF/Sheep_Lameroo_2022/spatial_boundary/HF_Lameroo_rough_10_proj.shp")  # this is the 
 
 Lameroo_Vf_area <-                  st_read("W:/VF/Sheep_Lameroo_2022/spatial_boundary/VF_proj.shp")
-Lameroo_Vf_area_buffer_5 <-                  st_read("W:/VF/Sheep_Lameroo_2022/spatial_boundary/VF_Buffer_proj.shp")
+Lameroo_Vf_area_buffer_10 <-                  st_read("W:/VF/Sheep_Lameroo_2022/spatial_boundary/VF_Buffer10_proj.shp")
+water_pt <-  st_read("W:/VF/Sheep_Lameroo_2022/spatial_boundary/water_pts.shp")
+
+HF_Lameroo_rough_10_proj.shp
 
 
-plot(Lameroo_Vf_area_hard_fence_bound)
-plot(Lameroo_paddock_area)
-plot(Lameroo_Vf_area)
 
 Lameroo_Vf_area_hard_fence_bound <-
   st_transform(Lameroo_Vf_area_hard_fence_bound, crs = 28354)
 
-Lameroo_Vf_area_buffer_5 <-
-  st_transform(Lameroo_Vf_area_buffer_5, crs = 28354)
+Lameroo_Vf_area_buffer_10 <-
+  st_transform(Lameroo_Vf_area_buffer_10, crs = 28354)
 Lameroo_Vf_area <-
   st_transform(Lameroo_Vf_area, crs = 28354)
+water_pt <-
+  st_transform(water_pt, crs = 28354)
 
+Lameroo_Vf_area_hard_fence_bound_buff<-
+  st_transform(Lameroo_Vf_area_hard_fence_bound_buff, crs = 28354)
 
 
 ggplot() +
   geom_sf(data = Lameroo_Vf_area_hard_fence_bound, color = "black", fill = NA) +
   geom_sf(data = Lameroo_Vf_area, color = "black", fill = NA) +
-  geom_sf(data = Lameroo_Vf_area_buffer_5, color = "black", fill = NA) +
+  geom_sf(data = Lameroo_Vf_area_buffer_10, color = "black", fill = NA) +
   #geom_sf(data = water_pts_sf ,color ="Blue") +
   geom_sf(data = animal_GPS_data_sf_trans ,alpha = 0.01) +
   theme_bw()+
   theme(legend.position = "none",
         axis.ticks = element_blank(), axis.text.x = element_blank(), axis.text.y = element_blank())+
-  labs(title = "all animal logs")
+  labs(title = "all animal logs with a buffer of 10m")
 
 
 
 ggplot() +
   geom_sf(data = Lameroo_Vf_area_hard_fence_bound, color = "black", fill = NA) +
   geom_sf(data = Lameroo_Vf_area, color = "black", fill = NA) +
-  geom_sf(data = Lameroo_Vf_area_buffer_5, color = "black", fill = NA) +
+  geom_sf(data = Lameroo_Vf_area_buffer_10, color = "black", fill = NA) +
   #geom_sf(data = water_pts_sf ,color ="Blue") +
   geom_sf(data = animal_GPS_data_sf_trans ,alpha = 0.01) +
   theme_bw()+
@@ -139,7 +184,7 @@ GPS_data_sf_trans_17 <- GPS_data_sf_trans_17 %>%
 ggplot() +
   geom_sf(data = Lameroo_Vf_area_hard_fence_bound, color = "black", fill = NA) +
   geom_sf(data = Lameroo_Vf_area, color = "black", fill = NA) +
-  geom_sf(data = Lameroo_Vf_area_buffer_5, color = "black", fill = NA) +
+  geom_sf(data = Lameroo_Vf_area_buffer_10, color = "black", fill = NA) +
   #geom_sf(data = water_pts_sf ,color ="Blue") +
   geom_sf(data = GPS_data_sf_trans_17 ,alpha = 1) +
   theme_bw()+
@@ -165,7 +210,7 @@ GPS_data_sf_trans_17_Hr_13 <- GPS_data_sf_trans_17 %>%
 ggplot() +
   geom_sf(data = Lameroo_Vf_area_hard_fence_bound, color = "black", fill = NA) +
   geom_sf(data = Lameroo_Vf_area, color = "black", fill = NA) +
-  geom_sf(data = Lameroo_Vf_area_buffer_5, color = "black", fill = NA) +
+  geom_sf(data = Lameroo_Vf_area_buffer_10, color = "black", fill = NA) +
   #geom_sf(data = water_pts_sf ,color ="Blue") +
   geom_sf(data = GPS_data_sf_trans_17_Hr_11 ,alpha = 1) +
   theme_bw()+
@@ -177,7 +222,7 @@ ggplot() +
 ggplot() +
   geom_sf(data = Lameroo_Vf_area_hard_fence_bound, color = "black", fill = NA) +
   geom_sf(data = Lameroo_Vf_area, color = "black", fill = NA) +
-  geom_sf(data = Lameroo_Vf_area_buffer_5, color = "black", fill = NA) +
+  geom_sf(data = Lameroo_Vf_area_buffer_10, color = "black", fill = NA) +
   #geom_sf(data = water_pts_sf ,color ="Blue") +
   geom_sf(data = GPS_data_sf_trans_17_Hr_12 ,alpha = 1) +
   theme_bw()+
@@ -189,7 +234,7 @@ ggplot() +
 ggplot() +
   geom_sf(data = Lameroo_Vf_area_hard_fence_bound, color = "black", fill = NA) +
   geom_sf(data = Lameroo_Vf_area, color = "black", fill = NA) +
-  geom_sf(data = Lameroo_Vf_area_buffer_5, color = "black", fill = NA) +
+  geom_sf(data = Lameroo_Vf_area_buffer_10, color = "black", fill = NA) +
   #geom_sf(data = water_pts_sf ,color ="Blue") +
   geom_sf(data = GPS_data_sf_trans_17_Hr_12 ,alpha = 1) +
   theme_bw()+
@@ -202,7 +247,7 @@ ggplot() +
 ggplot() +
   geom_sf(data = Lameroo_Vf_area_hard_fence_bound, color = "black", fill = NA) +
   geom_sf(data = Lameroo_Vf_area, color = "black", fill = NA) +
-  geom_sf(data = Lameroo_Vf_area_buffer_5, color = "black", fill = NA) +
+  geom_sf(data = Lameroo_Vf_area_buffer_10, color = "black", fill = NA) +
   #geom_sf(data = water_pts_sf ,color ="Blue") +
   geom_sf(data = GPS_data_sf_trans_17_Hr_13 ,alpha = 1) +
   theme_bw()+
@@ -214,6 +259,24 @@ ggplot() +
 ### so it look like the VF started at 13:10 prior to this the animals were training
 ## the data will need a new clm for training and VF trial
 
+rm(GPS_data_sf_trans_17, GPS_data_sf_trans_17_Hr_11, GPS_data_sf_trans_17_Hr_12, GPS_data_sf_trans_17_Hr_13)
+
+
+
+
+
+################################################################################
+#### filtering out data based on times ####
+
+# start of trial and training period (according to sue) - keep everything after  17th 11:35
+
+animal_GPS_data_sf_trans <- animal_GPS_data_sf_trans %>% 
+  filter(
+  local_time >=  ymd_hms("2022-10-17 11:35:00", tz= "Australia/Adelaide"))
+
+
+
+### start of training period 
 
 animal_GPS_data_sf_trans <- animal_GPS_data_sf_trans %>% 
   mutate(training_period = case_when(
@@ -225,143 +288,172 @@ animal_GPS_data_sf_trans <- animal_GPS_data_sf_trans %>%
 
 ### filter data between two dates start and end of trial
 
-animal_GPS_data_sf_trans <- animal_GPS_data_sf_trans %>%  filter(local_time >= ymd_hms("2022-10-17 10:00:00", tz= "Australia/Adelaide"), #yyy-mm-dd hh:mm:ss
-                                               local_time <=  ymd_hms("2022-10-21 11:50:00", tz= "Australia/Adelaide"))
+animal_GPS_data_sf_trans <- animal_GPS_data_sf_trans %>%
+  filter(
+    local_time <=  ymd_hms("2022-10-21 11:50:00", tz = "Australia/Adelaide")
+  )
 
-rm(GPS_data_sf_trans_17_Hr_13, GPS_data_sf_trans_17_Hr_12, GPS_data_sf_trans_17_Hr_11, GPS_data_sf_trans_17)
 
+#### each day the animals were yarded so i need to remove this data
+
+# let divide the data per day
+day_17 <- animal_GPS_data_sf_trans %>%  filter(date == "2022-10-17")
+day_18 <- animal_GPS_data_sf_trans %>%  filter(date == "2022-10-18")
+day_19 <- animal_GPS_data_sf_trans %>%  filter(date == "2022-10-19")
+day_20 <- animal_GPS_data_sf_trans %>%  filter(date == "2022-10-20")
+day_21 <- animal_GPS_data_sf_trans %>%  filter(date == "2022-10-21")
+
+# keep everything after before yarding and after yarding
+
+day_18_before_yarding <- day_18 %>%
+  filter(local_time <=  ymd_hms("2022-10-18 09:40:00", tz = "Australia/Adelaide"))
+day_18_after_yarding <- day_18 %>%
+  filter(local_time >=  ymd_hms("2022-10-18 10:30:00", tz = "Australia/Adelaide"))
+                  
+day_18_clean <- rbind(day_18_before_yarding, day_18_after_yarding)
+rm(day_18_before_yarding, day_18_after_yarding, day_18)
+
+
+day_19_before_yarding <- day_19 %>%
+  filter(local_time <=  ymd_hms("2022-10-19 09:10:00", tz = "Australia/Adelaide"))
+day_19_after_yarding <- day_19 %>%
+  filter(local_time >=  ymd_hms("2022-10-19 10:18:00", tz = "Australia/Adelaide"))
+
+day_19_clean <- rbind(day_19_before_yarding, day_19_after_yarding)
+rm(day_19_before_yarding, day_19_after_yarding, day_19)
+
+
+
+day_20_before_yarding <- day_20 %>%
+  filter(local_time <=  ymd_hms("2022-10-20 08:58:00", tz = "Australia/Adelaide"))
+day_20_after_yarding <- day_20 %>%
+  filter(local_time >=  ymd_hms("2022-10-20 10:19:00", tz = "Australia/Adelaide"))
+
+day_20_clean <- rbind(day_20_before_yarding, day_20_after_yarding)
+rm(day_20_before_yarding, day_20_after_yarding, day_20)
+
+
+### put it back togther 
+
+animals_GPS_trim_time <- rbind(day_17, day_18_clean, day_19_clean, day_19_clean, day_20_clean, day_21)
+
+rm(day_17, day_18_clean, day_19_clean, day_19_clean, day_21, day_20_clean, animal_GPS_data_sf_trans)
+
+########################################################################################
+
+
+
+
+
+### remove the water and other animals logs
+
+unique(animals_GPS_trim_time_non_train$Sheep_ID)
+
+animals_GPS_trim_time <- animals_GPS_trim_time %>% 
+  filter(Sheep_ID !=  "other") %>% 
+  filter(Sheep_ID !=  "water_pt")
 
 
 ggplot() +
   geom_sf(data = Lameroo_Vf_area_hard_fence_bound, color = "black", fill = NA) +
   geom_sf(data = Lameroo_Vf_area, color = "black", fill = NA) +
-  geom_sf(data = Lameroo_Vf_area_buffer_5, color = "black", fill = NA) +
-  #geom_sf(data = water_pts_sf ,color ="Blue") +
-  geom_sf(data = animal_GPS_data_sf_trans ,alpha = 0.05) +
+  geom_sf(data = Lameroo_Vf_area_buffer_10, color = "black", fill = NA) +
+  geom_sf(data = water_pt ,color ="Blue") +
+  geom_sf(data = animals_GPS_trim_time ,alpha = 0.05) +
   facet_wrap(.~ date)+
   theme_bw()+
   theme(legend.position = "none",
         axis.ticks = element_blank(), axis.text.x = element_blank(), axis.text.y = element_blank())+
-  labs(title = "all animal logs between 17th at 10:30 and 21st at 11:50")
+  labs(title = "All animal logs between 17th at 10:30 and 21st at 11:50",
+  subtitle = "log when animals were yarded removed")
 
 
 
 
-animal_GPS_non_training <- animal_GPS_data_sf_trans %>% 
-  filter(training_period == "non_training")
 
 
-ggplot() +
-  geom_sf(data = Lameroo_Vf_area_hard_fence_bound, color = "black", fill = NA) +
-  geom_sf(data = Lameroo_Vf_area, color = "black", fill = NA) +
-  geom_sf(data = Lameroo_Vf_area_buffer_5, color = "black", fill = NA) +
-  #geom_sf(data = water_pts_sf ,color ="Blue") +
-  geom_sf(data = animal_GPS_non_training ,alpha = 0.05) +
-  facet_wrap(.~ date)+
-  theme_bw()+
-  theme(legend.position = "none",
-        axis.ticks = element_blank(), axis.text.x = element_blank(), axis.text.y = element_blank())+
-  labs(title = "all animal logs between 17th at 13:10 and 21st at 11:50",
-       subtitle = "non training")
 
-
-## what is the water point?
-list_of_deviceName <- unique(animal_GPS_non_training$deviceName)
-
-ggplot() +
-  geom_sf(data = Lameroo_Vf_area_hard_fence_bound, color = "black", fill = NA) +
-  geom_sf(data = Lameroo_Vf_area, color = "black", fill = NA) +
-  geom_sf(data = Lameroo_Vf_area_buffer_5, color = "black", fill = NA) +
-  #geom_sf(data = water_pts_sf ,color ="Blue") +
-  geom_sf(data = animal_GPS_non_training ,alpha = 0.05) +
-  facet_wrap(.~ deviceName)+
-  theme_bw()+
-  theme(legend.position = "none",
-        axis.ticks = element_blank(), axis.text.x = element_blank(), axis.text.y = element_blank())+
-  labs(title = "all animal logs between 17th at 13:10 and 21st at 11:50",
-       subtitle = "non training")
-
-
-#------------------UP TO HERE ------------------------------------##
-### I have asked Sue and Dana about the data 27/10/2022 waiting for resposne.
 
 
 ################################################################
-###               Clip to the VF hard fences           #########
+### Clip to the VF hard fences  with 10 meter buffer   #########
 ################################################################
 
-# plot(pinnaroo_Vf_area_hard_fence_bound)
-# 
-# #To the large block boundary
-# animal_GPS_data_sf_trans_clip <-
-#   st_intersection(animal_GPS_data_sf_trans, pinnaroo_Vf_area_hard_fence_bound)
-# 
-# 
-# ## remove all the rows that don't have fence ID
-# #unique(animal_GPS_data_sf_trans_clip$fencesID)
-# animal_GPS_data_sf_trans_clip <-animal_GPS_data_sf_trans_clip %>% 
-#   filter(!is.na(fencesID) ) %>% 
-#   filter(fencesID !=  "NULL")
-# str(animal_GPS_data_sf_trans_clip)
-# 
-# 
-# rm(animal_GPS_data, animal_GPS_data_sf, animal_GPS_data_sf_trans)
+
+#To the large block boundary
+animals_GPS_trim_time_clip <-
+  st_intersection(animals_GPS_trim_time, Lameroo_Vf_area_buffer_10)
+
+
+## remove all the rows that don't have fence ID
+#unique(animal_GPS_data_sf_trans_clip$fencesID)
+animals_GPS_trim_time_clip <-animals_GPS_trim_time_clip %>%
+  filter(!is.na(fencesID) ) %>%
+  filter(fencesID !=  "NULL")
+
 
 
 ########################################################################################################
 
 
 
-pinnaroo_Vf_area <- pinnaroo_Vf_area %>% 
-  rename("Jax_fence_ID"  = "Jax_Fence_")
 
 #Write out files "W:/VF/Pinnaroo 2022/animal_log/jax_working_outputs"
 
-output_path <- "W:/VF/Pinnaroo 2022/animal_log/jax_working_outputs"
-str(pinnaroo_paddock_area)
-str(pinnaroo_Vf_area)
-str(animal_GPS_data_sf_trans_clip)
+output_path <- "W:/VF/Sheep_Lameroo_2022/animal_logs/jax_working"
 
 
-#write_sf(pinnaroo_paddock_area)
-st_write(pinnaroo_paddock_area, 
-         dsn = output_path, 
-         layer = "pinnaroo_paddock_area.shp", 
-         driver = "ESRI Shapefile")
+animals_log <- animals_GPS_trim_time_clip
+animals_log_training <- animals_log %>% filter(training_period == "training")
+animals_log_NON_training <- animals_log %>% filter(training_period != "training") 
 
-st_write(pinnaroo_Vf_area, 
-         dsn = output_path, 
-         layer = "pinnaroo_Vf_area.shp", 
-         driver = "ESRI Shapefile")
-
-
+rm(animals_GPS_trim_time, animals_GPS_trim_time_clip)
 ############################################################################################################################
 ### format the aniaml log data so I output the clm with local time and keep time difference cals and have clm for x and y
 
 ## convert the geom clm into x and y clms
 
 
-coordinates <-as.data.frame( st_coordinates(animal_GPS_data_sf_trans_clip))
-animal_GPS_data_sf_trans_clip <- as.data.frame(animal_GPS_data_sf_trans_clip)
+coordinates <-as.data.frame( st_coordinates(animals_log_NON_training))
+animals_log_NON_training <- as.data.frame(animals_log_NON_training)
 
-animal_GPS_data_sf_trans_clip <- animal_GPS_data_sf_trans_clip %>% 
+animals_log_NON_training <- animals_log_NON_training %>% 
   dplyr::select(-"geometry")
 
 
-animal_GPS_data_sf_trans_clip <-   cbind(animal_GPS_data_sf_trans_clip,coordinates )
+animals_log <-   cbind(animals_log_NON_training,coordinates )
 ## ensure the date and time clms are outputting and outputting in the correct format.
 
 
-animal_GPS_data_sf_trans_clip$local_time <-   format(animal_GPS_data_sf_trans_clip$local_time, usetz=TRUE)
-animal_GPS_data_sf_trans_clip$GMT        <-   format(animal_GPS_data_sf_trans_clip$GMT, usetz=TRUE)
-animal_GPS_data_sf_trans_clip$start_fence <-  format(animal_GPS_data_sf_trans_clip$start_fence, usetz=TRUE)
-animal_GPS_data_sf_trans_clip$end_fence    <- format(animal_GPS_data_sf_trans_clip$end_fence, usetz=TRUE)
-animal_GPS_data_sf_trans_clip$start_trial    <- format(animal_GPS_data_sf_trans_clip$start_trial, usetz=TRUE)
+animals_log$local_time <-   format(animals_log$local_time, usetz=TRUE)
+animals_log$GMT        <-   format(animals_log$GMT, usetz=TRUE)
+animals_log$start_fence <-  format(animals_log$start_fence, usetz=TRUE)
+animals_log$end_fence    <- format(animals_log$end_fence, usetz=TRUE)
+animals_log$start_trial    <- format(animals_log$start_trial, usetz=TRUE)
 
-write.csv(animal_GPS_data_sf_trans_clip, 
-          paste0(output_path,"/animal_GPS_data_sf_trans_clip.csv"), 
+write.csv(animals_log, 
+          paste0(output_path,"/animals_log_non_training.csv"), 
           row.names=FALSE)
+#############################################################
+
+coordinates <-as.data.frame( st_coordinates(animals_log_training))
+animals_log_training <- as.data.frame(animals_log_training)
+
+animals_log_training <- animals_log_training %>% 
+  dplyr::select(-"geometry")
 
 
+animals_log <-   cbind(animals_log_training,coordinates )
+## ensure the date and time clms are outputting and outputting in the correct format.
 
+
+animals_log$local_time <-   format(animals_log$local_time, usetz=TRUE)
+animals_log$GMT        <-   format(animals_log$GMT, usetz=TRUE)
+animals_log$start_fence <-  format(animals_log$start_fence, usetz=TRUE)
+animals_log$end_fence    <- format(animals_log$end_fence, usetz=TRUE)
+animals_log$start_trial    <- format(animals_log$start_trial, usetz=TRUE)
+
+write.csv(animals_log, 
+          paste0(output_path,"/animals_log_training.csv"), 
+          row.names=FALSE)
 
