@@ -1,0 +1,81 @@
+---
+title: "VF Sheep"
+author: "Jackie"
+date: "2022-11-02"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Aim of the trial
+
+Implement VF collars on a commercial farm.
+The aim was to ensure the collars work and that they are safe and effective.
+
+Evaluate the cue and pulse data and animal movement during the training period and the trail.
+
+## Location of the trial
+
+Note that we have included a 10m buffer around the paddock boundaries.
+And the map displays the buffer for the VF too
+
+The VF trial only had one fence.
+
+```{r map of the paddock boundaries}
+
+
+
+
+```
+
+## Lenegth and dates of the trial
+Start of training period 
+End of training period
+
+The animals were yarded everyday and during this time collar and health check were performed.
+The collars continued to log during this time therefore the data needs to be cropped to reflect the only trial times
+
+Day 1 animals yarded in out
+Day 2 animals yarded in out
+Day 3 animals yarded in out
+Day 4 animals yarded in out
+Day 5 animals yarded in out
+
+
+
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+## Animal collar used
+
+Location of the raw data
+
+
+## Background information on animal collar data from Gallagher
+
+*Contact*
+
+*Data provided*
+
+*TimeofEvent*
+
+*GPS*
+
+*Audio and pulse readings*
+
+*Virtual Fence*
+
+*Animal activity*
+
+
+
+
+## Data manipulation notes.
+
+step 1 
+step 2
+step 3
