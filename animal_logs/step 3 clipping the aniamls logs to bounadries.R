@@ -59,7 +59,7 @@ step1_2_sf <-   st_as_sf(step1_2,
 
 
 
-#### UP TO HERE #####
+
 
 
 
@@ -75,8 +75,25 @@ step1_2_sf_clip <-step1_2_sf_clip %>%
   filter(fencesID !=  "NULL")
 
 
+## convert the geom clm into x and y clms
+
+
+coordinates <-as.data.frame( st_coordinates(step1_2_sf_clip))
+step1_2_sf_clip_df <- as.data.frame(step1_2_sf_clip)
+
+step1_2_sf_clip_df <- step1_2_sf_clip_df %>% 
+  dplyr::select(-"geometry")
+
+
+step1_2_sf_clip_df <-   cbind(step1_2_sf_clip_df,coordinates )
+
+
+
+
+
+
 path_output_files <- "W:/VF/Sheep_Lameroo_2022/animal_logs/jax_working/"
 path_output_files
-write.csv(step1_2_sf_clip, 
+write.csv(step1_2_sf_clip_df, 
           paste0(path_output_files,"/animal_GPS_data_step1_2_3.csv"), 
           row.names=FALSE)
