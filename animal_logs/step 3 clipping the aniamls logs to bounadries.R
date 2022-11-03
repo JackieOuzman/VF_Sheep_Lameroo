@@ -64,12 +64,19 @@ step1_2_sf <-   st_as_sf(step1_2,
 
 
 #To the large block boundary
-animals_GPS_trim_time_clip <-
-  st_intersection(animals_GPS_trim_time, Lameroo_Vf_area_hard_fence_bound_buff)
+step1_2_sf_clip <-
+  st_intersection(step1_2_sf, Lameroo_Vf_area_hard_fence_bound_buff)
 
 
 ## remove all the rows that don't have fence ID
 #unique(animal_GPS_data_sf_trans_clip$fencesID)
-animals_GPS_trim_time_clip <-animals_GPS_trim_time_clip %>%
+step1_2_sf_clip <-step1_2_sf_clip %>%
   filter(!is.na(fencesID) ) %>%
   filter(fencesID !=  "NULL")
+
+
+path_output_files <- "W:/VF/Sheep_Lameroo_2022/animal_logs/jax_working/"
+path_output_files
+write.csv(step1_2_sf_clip, 
+          paste0(path_output_files,"/animal_GPS_data_step1_2_3.csv"), 
+          row.names=FALSE)

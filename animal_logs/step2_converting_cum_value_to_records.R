@@ -132,6 +132,6 @@ rm( temp_490705,
 
 path_output_files
 write.csv(Fence_all, 
-          paste0(path_output_files,"/animal_GPS_data_nonTrain_step1_2.csv"), 
+          paste0(path_output_files,"/animal_GPS_data_step1_2.csv"), 
           row.names=FALSE)
 
