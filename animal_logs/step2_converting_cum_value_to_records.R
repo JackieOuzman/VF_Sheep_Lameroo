@@ -11,23 +11,26 @@ library(sf)
 ## this code takes the cleaned data and splits it into animals and converts the cumm value into counts
 
 path_output_files <- "W:/VF/Sheep_Lameroo_2022/animal_logs/jax_working/"
-VF_animals_logs <- read_csv(paste0(path_output_files,"animals_log_non_training.csv"))
+VF_animals_logs <- read_csv(paste0(path_output_files,"animals_GPS_trim_time_step1.csv"))
 names(VF_animals_logs)
 
+
 ### check on records
+
 check_records <- VF_animals_logs %>% 
-  group_by( Sheep_ID, deviceName , date) %>% 
-  summarise(n_AudioCount = sum(cumulativeAudioCount),
-            n_ShockCount = sum(cumulativeShockCount)
-  )
+  dplyr::group_by(date,deviceName, Sheep_ID) %>% 
+  dplyr::summarise(n_AudioCount = sum(cumulativeAudioCount),
+                   n_ShockCount = sum(cumulativeShockCount)
+                   )
+
 
 check_records <- check_records %>% 
   arrange( Sheep_ID,date,deviceName, n_AudioCount )
 
 ### check on values
 check_min_max <- VF_animals_logs %>% 
-  group_by( Sheep_ID , deviceName, date) %>% 
-  summarise(min_AudioCount = min(cumulativeAudioCount,na.rm = TRUE),
+  dplyr::group_by(date,deviceName, Sheep_ID) %>% 
+  dplyr::summarise(min_AudioCount = min(cumulativeAudioCount,na.rm = TRUE),
             max_AudioCount = max(cumulativeAudioCount,na.rm = TRUE),
             min_ShockCount = sum(cumulativeShockCount,na.rm = TRUE),
             max_ShockCount = max(cumulativeShockCount,na.rm = TRUE)
@@ -44,17 +47,10 @@ str(VF_animals_logs)
 
 #list_animals <- "1_1390038"
 list_animals <- VF_animals_logs %>% 
-  select(deviceName) %>% 
+  dplyr::select(deviceName) %>% 
   distinct(deviceName)
 list_animals <-ungroup(list_animals)
-list_animals
 
-
-
-test <- list_animals
-#list_animals <- head(list_animals,20)
-
-# I can't understand why it falls over?? - it wasn't a list??
 
 list_animals$deviceName[1:34]
 list_animals <- c(
@@ -93,7 +89,7 @@ for (list_animals in list_animals){
   df <- df %>% 
     mutate(Shock_values = cumulativeShockCount - lag(cumulativeShockCount))
   
-  df <- df %>%  select(ID_jaxs:fencesID ,Audio_values, Shock_values, resting_percentage:Y   )
+  df <- df %>%  dplyr::select(ID_jaxs:fencesID ,Audio_values, Shock_values, resting_percentage:Y   )
   
   name <- paste0("temp_",deviceName_x)
   assign(name,df)
@@ -139,30 +135,3 @@ write.csv(Fence_all,
           paste0(path_output_files,"/animal_GPS_data_nonTrain_step1_2.csv"), 
           row.names=FALSE)
 
-names(Fence_all)
-
-check <-
-  Fence_all %>% select(deviceName,
-                       Audio_values  ,
-                       Shock_values, 
-                       local_time ,  
-                       Sheep_ID   )
-
-
-################################################################################
-## per animal per day what is the total (sum) and then what is the ratio
-names(Fence_all)
-
-non_train_summary <-  Fence_all %>% 
-  group_by(Sheep_ID, date) %>% 
-  summarise(sum_aduio = sum(Audio_values, na.rm = TRUE),
-            sum_pulse = sum(Shock_values, na.rm = TRUE),
-            ratio = (sum_aduio/(sum_pulse+ sum_aduio))*100)
-non_train_summary$ratio <-   round(non_train_summary$ratio ,2)
-
-non_train_summary$ratio [is.nan(non_train_summary$ratio )]<-NA
-
-
-write.csv(non_train_summary, 
-          paste0(path_output_files,"/summary_nonTrain.csv"), 
-          row.names=FALSE)
