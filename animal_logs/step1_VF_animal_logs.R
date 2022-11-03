@@ -426,21 +426,6 @@ ggplot() +
 
 
 
-################################################################
-### Clip to the VF hard fences  with 10 meter buffer   #########
-################################################################
-
-
-#To the large block boundary
-animals_GPS_trim_time_clip <-
-  st_intersection(animals_GPS_trim_time, Lameroo_Vf_area_hard_fence_bound_buff)
-
-
-## remove all the rows that don't have fence ID
-#unique(animal_GPS_data_sf_trans_clip$fencesID)
-animals_GPS_trim_time_clip <-animals_GPS_trim_time_clip %>%
-  filter(!is.na(fencesID) ) %>%
-  filter(fencesID !=  "NULL")
 
 
 
@@ -448,63 +433,36 @@ animals_GPS_trim_time_clip <-animals_GPS_trim_time_clip %>%
 
 
 
-
-#Write out files "W:/VF/Pinnaroo 2022/animal_log/jax_working_outputs"
-
-output_path <- "W:/VF/Sheep_Lameroo_2022/animal_logs/jax_working"
+output_path <- "W:/VF/Sheep_Lameroo_2022/animal_logs/jax_working"  #animals_GPS_trim_time
 
 
-animals_log <- animals_GPS_trim_time_clip
-animals_log_training <- animals_log %>% filter(training_period == "training")
-animals_log_NON_training <- animals_log %>% filter(training_period != "training") 
-
-rm(animals_GPS_trim_time, animals_GPS_trim_time_clip)
 ############################################################################################################################
 ### format the aniaml log data so I output the clm with local time and keep time difference cals and have clm for x and y
 
 ## convert the geom clm into x and y clms
 
 
-coordinates <-as.data.frame( st_coordinates(animals_log_NON_training))
-animals_log_NON_training <- as.data.frame(animals_log_NON_training)
+coordinates <-as.data.frame( st_coordinates(animals_GPS_trim_time))
+animals_GPS_trim_time_df <- as.data.frame(animals_GPS_trim_time)
 
-animals_log_NON_training <- animals_log_NON_training %>% 
+animals_GPS_trim_time_df <- animals_GPS_trim_time_df %>% 
   dplyr::select(-"geometry")
 
 
-animals_log <-   cbind(animals_log_NON_training,coordinates )
+animals_GPS_trim_time <-   cbind(animals_GPS_trim_time_df,coordinates )
 ## ensure the date and time clms are outputting and outputting in the correct format.
 
 
-animals_log$local_time <-   format(animals_log$local_time, usetz=TRUE)
-animals_log$GMT        <-   format(animals_log$GMT, usetz=TRUE)
-animals_log$start_fence <-  format(animals_log$start_fence, usetz=TRUE)
-animals_log$end_fence    <- format(animals_log$end_fence, usetz=TRUE)
-animals_log$start_trial    <- format(animals_log$start_trial, usetz=TRUE)
+animals_GPS_trim_time$local_time <-   format(animals_GPS_trim_time$local_time, usetz=TRUE)
+animals_GPS_trim_time$GMT        <-   format(animals_GPS_trim_time$GMT, usetz=TRUE)
+animals_GPS_trim_time$start_fence <-  format(animals_GPS_trim_time$start_fence, usetz=TRUE)
+animals_GPS_trim_time$end_fence    <- format(animals_GPS_trim_time$end_fence, usetz=TRUE)
+animals_GPS_trim_time$start_trial    <- format(animals_GPS_trim_time$start_trial, usetz=TRUE)
 
-write.csv(animals_log, 
-          paste0(output_path,"/animals_log_non_training.csv"), 
+write.csv(animals_GPS_trim_time, 
+          paste0(output_path,"/animals_GPS_trim_time_step1.csv"), 
           row.names=FALSE)
 #############################################################
 
-coordinates <-as.data.frame( st_coordinates(animals_log_training))
-animals_log_training <- as.data.frame(animals_log_training)
 
-animals_log_training <- animals_log_training %>% 
-  dplyr::select(-"geometry")
-
-
-animals_log <-   cbind(animals_log_training,coordinates )
-## ensure the date and time clms are outputting and outputting in the correct format.
-
-
-animals_log$local_time <-   format(animals_log$local_time, usetz=TRUE)
-animals_log$GMT        <-   format(animals_log$GMT, usetz=TRUE)
-animals_log$start_fence <-  format(animals_log$start_fence, usetz=TRUE)
-animals_log$end_fence    <- format(animals_log$end_fence, usetz=TRUE)
-animals_log$start_trial    <- format(animals_log$start_trial, usetz=TRUE)
-
-write.csv(animals_log, 
-          paste0(output_path,"/animals_log_training.csv"), 
-          row.names=FALSE)
 
