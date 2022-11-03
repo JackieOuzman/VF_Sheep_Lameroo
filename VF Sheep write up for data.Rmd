@@ -342,7 +342,7 @@ This data is saved
 
 - **use step 3 scripts**
 
-  ""C:\Users\ouz001\working_from_home_post_Sep2022\VF_Sheep_Lameroo\animal_logs\step 3 clipping the aniamls logs to bounadries.R""
+  "C:\Users\ouz001\working_from_home_post_Sep2022\VF_Sheep_Lameroo\animal_logs\step 3 clipping the aniamls logs to bounadries.R"
   
   This is in the GitHub repository too.
   
@@ -353,7 +353,7 @@ This data is saved
 - This seems to be a problem in this trial, the paddock is small and the sheep enjoy camping next to the physical fence.
 - The GPS has 5 - 10m accuracy (but I have always thought this was better than this)
   
-
+### UP TO HERE ####
 
 
 
