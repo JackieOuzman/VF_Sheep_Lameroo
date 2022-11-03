@@ -48,6 +48,21 @@ Lameroo_Vf_area_hard_fence_bound_buff<-
 ################################################################
 
 
+
+step1_2 <- read_csv("W:/VF/Sheep_Lameroo_2022/animal_logs/jax_working/animal_GPS_data_step1_2.csv")
+
+#turn into spatial data
+step1_2_sf <-   st_as_sf(step1_2,
+                       coords = c("X", "Y"),
+                       crs = 28354,
+                       agr = "constant")
+
+
+
+#### UP TO HERE #####
+
+
+
 #To the large block boundary
 animals_GPS_trim_time_clip <-
   st_intersection(animals_GPS_trim_time, Lameroo_Vf_area_hard_fence_bound_buff)
