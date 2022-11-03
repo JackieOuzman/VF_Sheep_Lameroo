@@ -4,54 +4,119 @@ author: "Jackie"
 date: "2022-11-02"
 output: html_document
 ---
-
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+
+
+```{r lib, include=FALSE}
+library(dplyr)
+library(tidyverse)
+library(readr)
+library(lubridate)
+library(DT)
+library(sp)
+
+
+library(rgdal)
+#library(sf)
+
+#install.packages("plotKML")
+library(plotKML)
+library(knitr)
+library(png)
+
+library(readxl)
+
+
+library(ggmap)
+library(maps)
+library(mapdata)
+
+library(raster)
+library(agricolae)
+library(FSA) 
+library(agricolae)
+library(multcomp)
+library(lsmeans)
+#library(hms) Add these before I use them?
+#library(plyr)
+
+library(readxl)
+library(tidyverse)
+library(dplyr)
+library(FSA) 
+library(agricolae)
+library(multcomp)
+library(multcomp)
+library(lsmeans)
+library(multcompView)
+library(Rmisc)
+
+library(ggplot2)
+library(car)
+library(DescTools)
+```
+
 ## Aim of the trial
 
-Implement VF collars on a commercial farm.
-The aim was to ensure the collars work and that they are safe and effective.
+To implement VF collars on a commercial farm, and ensure the collars are safe and effective.
 
 Evaluate the cue and pulse data and animal movement during the training period and the trail.
 
 ## Location of the trial
 
-Note that we have included a 10m buffer around the paddock boundaries.
-And the map displays the buffer for the VF too
+The trial is located in Lameroo -35.285283, 140.376381.
 
-The VF trial only had one fence.
+The paddock boundaries are digitized using google earth pro.
 
-```{r map of the paddock boundaries}
-
+The dashed line is a 10m buffer around the paddock boundaries.
 
 
+```{r Lameroo paddock bounadries hard fences, echo=FALSE, message=FALSE, warning=FALSE}
+
+include_graphics("W:/VF/Sheep_Lameroo_2022/spatial_boundary/Boundary map for report.png")
 
 ```
 
 ## Lenegth and dates of the trial
-Start of training period 
-End of training period
+
+- Start of training period Day 1 17/10/2022 at 
+- End of training period   Day 1 17/10/2022 at 11:30
 
 The animals were yarded everyday and during this time collar and health check were performed.
 The collars continued to log during this time therefore the data needs to be cropped to reflect the only trial times
 
-Day 1 animals yarded in out
-Day 2 animals yarded in out
-Day 3 animals yarded in out
-Day 4 animals yarded in out
-Day 5 animals yarded in out
+- Day 1 17/10/2022 animals were not yarded the animals started the trial at 11:35
+- Day 2 18/10/2022 animals yarded in at 9:40 and back in trial paddock at 10:30
+- Day 3 19/10/2022 animals yarded in at 9:10 and back in trial paddock at 10:18
+- Day 4 20/10/2022 animals yarded in at 8:58 and back in trial paddock at 10:19
+- Day 8 21/10/2022 animals yarded in at 11:50 end of the trial
 
 
 
 
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
+
 
 ## Animal collar used
-
+ 
+ 
+|  deviceName	    | Sheep ID   | Comments	                                                | 
+| ----------------| -----------|----------------                                          |
+| 1390743       	| 10   	     |  AKA labelled as blank                                   | 
+| 1390581	        | 1          |	                                                        |	
+| 1390826         |	2          |	before 18/10/2022 I assume at 10:30 when it was yarded  |	
+| 1391505         | 2          |	after 18/10/2022 I assume at 10:30 when it was yarded   |	
+| 490705          |	3          |	                                                        | 
+| 1390577         |	4          |	                                                        | 
+| 1390737         |	5          |	                                                        | 
+| 1390749         | 6          |	                                                        | 
+| 1390456         | 7          |	                                                        | 
+| 1390182         | 8          |	                                                        | 
+| 1390736         | 9          |	                                                        | 
+| 1390189         | water pt   |	                                                        | 
+   
 Location of the raw data
 
 
@@ -59,18 +124,96 @@ Location of the raw data
 
 *Contact*
 
-*Data provided*
+The data scientist is:
 
-*TimeofEvent*
+Debdeep Guha
 
-*GPS*
+Gallagher eShepherd Pty Ltd
 
-*Audio and pulse readings*
+1100-1102 Toorak Road, Camberwell, VIC, 3124
 
-*Virtual Fence*
 
-*Animal activity*
+EMAIL  Debdeep.Guha@gallagher.com| WEB www.gallagher.com
 
+**Data provided**
+
+Every 10 mins generates a new row of data, but if the animal get a audio or pulse this creates a new entry.
+
+This can be viewed from the timeOfEvent column.
+
+**timeOfEvent**
+
+Note that this timeOfEvent has a date and time stamp which is in GMT.
+
+The *timeOfEvent* will need to be converted to local time.
+
+This is done in R with lubridate package.
+
+**GPS**
+
+The GPS data is a snapshot of the location of the animals in a 10 min window.
+
+Data columns that are supplied:
+
+- *gpsData.lat*	
+- *gpsData.lng*
+
+
+I will use the lat and long column to create a location of the animal in the 10 min window.
+
+The accuracy of this reading can be viewed within this 10 min window.
+
+
+
+
+
+**Stimuli - cue and audio readings**
+
+The *cumulativeAudioCount* and	*cumulativeShockCount* columns are a running total of how many stimuli the animal has received since the start of the trial, and is re calculated every 10 mins.
+
+It appears that the increments are not reset when a new fence is implement.
+Instead its just keeps cumulating.
+
+This poses a problem when the animals are yarded, they are not part of the trial during this time, but the collars and cues continue to log.
+
+
+**Device details**
+
+The *deviceName* is the name of the collar, more details about the mob is listed above.
+
+
+There is another columns which has information about the device this is called *deviceUIDHex*.
+
+**Virtual Fence**
+
+There is a column which is called *minDistanceToIZ*, which is the distance of the animal to the VF.
+
+I am not sure if this is the min distance the animal got to the fence in the 10 min window or its the distance calculated from the logged GPS point in the file in the 10 mins window.
+
+If it is the min distance the animal got to and not just the distance from the fence in the 'snap shot' this would be useful.
+
+Column called *fencesID* is the name of the fence.
+
+
+
+*"If the values in “fenceID” column as blank, this means there is no active virtual fence for that neckband yet. Therefore, if you are performing some analysis related to virtual fencing, you can ignore those rows with blank fenceIDs."*
+
+
+**Animal activity**
+
+There are 3 columns that relate to the 
+
+- *resting%*	
+
+- *moving%*
+
+- *grazing%* 
+
+
+
+The first 3 should add up to 100% and this is a sum value for the 10 min of time.
+
+For example in the 10 min window the animals has spent 37% of the time resting, 30% moving and 33% grazing.
 
 
 
@@ -79,3 +222,14 @@ Location of the raw data
 step 1 
 step 2
 step 3
+
+## Mean audio/pulse ratio 
+AIM: Across all animals, and by individual animal (could be interesting to see if they vary as cattle do?). 
+Plot training period vs the trial period.
+
+## GPS Plots
+AIM: Daily plots are probably sufficient. 
+But more frequent plots during the training period.
+And there was that instance where they broke through the fence overnight (we think something spooked them), so a more detailed breakdown of that could also be interesting too. 
+
+
