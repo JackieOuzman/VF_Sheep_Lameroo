@@ -172,6 +172,14 @@ facet_wrap(. ~ date)+
   labs(title = "all animal logs, dates as facet")
 
 
+
+
+
+
+
+
+
+# --------------------------------------------------------------------------------------------------------------------- #
 ###### Need to work out what the start time 
 #Rick said there was a time the animals moved back in the VF area after they were in the south of the paddock and this is the satrt time
 
@@ -259,24 +267,70 @@ ggplot() +
 ### so it look like the VF started at 13:10 prior to this the animals were training
 ## the data will need a new clm for training and VF trial
 
-rm(GPS_data_sf_trans_17, GPS_data_sf_trans_17_Hr_11, GPS_data_sf_trans_17_Hr_12, GPS_data_sf_trans_17_Hr_13)
+rm( GPS_data_sf_trans_17_Hr_12, GPS_data_sf_trans_17_Hr_13)
+
+
+
+
+### ok I also need to know when the training period started
+
+ggplot() +
+  geom_sf(data = Lameroo_Vf_area_hard_fence_bound, color = "black", fill = NA) +
+  geom_sf(data = Lameroo_Vf_area, color = "black", fill = NA) +
+  geom_sf(data = Lameroo_Vf_area_buffer_10, color = "black", fill = NA) +
+  #geom_sf(data = water_pts_sf ,color ="Blue") +
+  geom_sf(data = GPS_data_sf_trans_17 ,alpha = 1) +
+  theme_bw()+
+  theme(legend.position = "none",
+        axis.ticks = element_blank(), axis.text.x = element_blank(), axis.text.y = element_blank())+
+  facet_wrap(.~ hour)+
+  labs(title = "Day 1, hours as facet")
+
+## looks like they entered the paddock at 11am - but what was the exact time? look like it was 11:40
+ggplot() +
+  geom_sf(data = Lameroo_Vf_area_hard_fence_bound, color = "black", fill = NA) +
+  geom_sf(data = Lameroo_Vf_area, color = "black", fill = NA) +
+  geom_sf(data = Lameroo_Vf_area_buffer_10, color = "black", fill = NA) +
+  #geom_sf(data = water_pts_sf ,color ="Blue") +
+  geom_sf(data = GPS_data_sf_trans_17_Hr_11 ,alpha = 1) +
+  theme_bw()+
+  theme(legend.position = "none",
+        axis.ticks = element_blank(), axis.text.x = element_blank(), axis.text.y = element_blank())+
+  labs(title = "Day 1 at 11am minute as facet")+
+  facet_wrap(.~ minute)
+
+rm( GPS_data_sf_trans_17, GPS_data_sf_trans_17_Hr_11)
+
+
+# --------------------------------------------------------------------------------------------------------------------- #
+
+
+
+
+
 
 
 
 
 
 ################################################################################
-#### filtering out data based on times ####
+#### filtering out data based on times start of training period to the end of the trial ####
 
-# start of trial and training period (according to sue) - keep everything after  17th 11:35
+# start of trial and training period (according to sue) - keep everything after  17th 11:35 or 11:40 s above
 
 animal_GPS_data_sf_trans <- animal_GPS_data_sf_trans %>% 
   filter(
-  local_time >=  ymd_hms("2022-10-17 11:35:00", tz= "Australia/Adelaide"))
+  local_time >=  ymd_hms("2022-10-17 11:40:00", tz= "Australia/Adelaide"))
+
+animal_GPS_data_sf_trans <- animal_GPS_data_sf_trans %>% 
+  filter(
+    local_time <=  ymd_hms("2022-10-21 11:50:00", tz= "Australia/Adelaide"))
 
 
 
-### start of training period 
+
+
+### define a training period with new clm
 
 animal_GPS_data_sf_trans <- animal_GPS_data_sf_trans %>% 
   mutate(training_period = case_when(
@@ -286,12 +340,7 @@ animal_GPS_data_sf_trans <- animal_GPS_data_sf_trans %>%
   ))
 
 
-### filter data between two dates start and end of trial
 
-animal_GPS_data_sf_trans <- animal_GPS_data_sf_trans %>%
-  filter(
-    local_time <=  ymd_hms("2022-10-21 11:50:00", tz = "Australia/Adelaide")
-  )
 
 
 #### each day the animals were yarded so i need to remove this data
@@ -337,7 +386,7 @@ rm(day_20_before_yarding, day_20_after_yarding, day_20)
 
 animals_GPS_trim_time <- rbind(day_17, day_18_clean, day_19_clean, day_19_clean, day_20_clean, day_21)
 
-rm(day_17, day_18_clean, day_19_clean, day_19_clean, day_21, day_20_clean, animal_GPS_data_sf_trans)
+rm(day_17, day_18_clean, day_19_clean, day_21, day_20_clean, animal_GPS_data_sf_trans)
 
 ########################################################################################
 
@@ -364,13 +413,15 @@ ggplot() +
   theme_bw()+
   theme(legend.position = "none",
         axis.ticks = element_blank(), axis.text.x = element_blank(), axis.text.y = element_blank())+
-  labs(title = "All animal logs between 17th at 10:30 and 21st at 11:50",
+  labs(title = "All animal logs between 17th at 11:40 and 21st at 11:50",
   subtitle = "log when animals were yarded removed")
 
 
 
+# -------------------------------------------------------------------------------------------------- ###
 
 
+#I think this should be the end of step 1.
 
 
 
