@@ -352,8 +352,15 @@ This data is saved
 - Aim is to clip the data to the hard fence paddock boundaries 
 - This seems to be a problem in this trial, the paddock is small and the sheep enjoy camping next to the physical fence.
 - The GPS has 5 - 10m accuracy (but I have always thought this was better than this)
+- I have clipped step 1_2 df to the paddock boundaries with a 10 m buffer using st_intersection tool.
+- I have removed any data entries that has no Fence ID.
   
-### UP TO HERE ####
+This data is saved 
+  
+  "\\FSSA2-ADL\clw-share1\Microlab\VF\Sheep_Lameroo_2022\animal_logs\jax_working\animal_GPS_data_step1_2_3.csv"
+
+
+
 
 
 
