@@ -20,7 +20,7 @@ library(sp)
 
 
 library(rgdal)
-#library(sf)
+library(sf)
 
 #install.packages("plotKML")
 library(plotKML)
@@ -80,15 +80,15 @@ include_graphics("W:/VF/Sheep_Lameroo_2022/spatial_boundary/Boundary map for rep
 
 ```
 
-## Lenegth and dates of the trial
+## Length and dates of the trial
 
-- Start of training period Day 1 17/10/2022 at 
-- End of training period   Day 1 17/10/2022 at 11:30
+- Start of training period Day 1 17/10/2022 at 11:40
+- End of training period   Day 1 17/10/2022 at 13:00
 
 The animals were yarded everyday and during this time collar and health check were performed.
 The collars continued to log during this time therefore the data needs to be cropped to reflect the only trial times
 
-- Day 1 17/10/2022 animals were not yarded the animals started the trial at 11:35
+- Day 1 17/10/2022 animals were not yarded the animals started the trial at 13:10
 - Day 2 18/10/2022 animals yarded in at 9:40 and back in trial paddock at 10:30
 - Day 3 19/10/2022 animals yarded in at 9:10 and back in trial paddock at 10:18
 - Day 4 20/10/2022 animals yarded in at 8:58 and back in trial paddock at 10:19
@@ -164,9 +164,6 @@ I will use the lat and long column to create a location of the animal in the 10 
 The accuracy of this reading can be viewed within this 10 min window.
 
 
-
-
-
 **Stimuli - cue and audio readings**
 
 The *cumulativeAudioCount* and	*cumulativeShockCount* columns are a running total of how many stimuli the animal has received since the start of the trial, and is re calculated every 10 mins.
@@ -215,11 +212,108 @@ The first 3 should add up to 100% and this is a sum value for the 10 min of time
 
 For example in the 10 min window the animals has spent 37% of the time resting, 30% moving and 33% grazing.
 
+## Location of raw data.
+
+- "\\FSSA2-ADL\clw-share1\Microlab\VF\Sheep_Lameroo_2022\animal_logs\raw_data\db_trial_csiro_lemaroo_mob_287_vf_boundary_data.csv"
+- "\\FSSA2-ADL\clw-share1\Microlab\VF\Sheep_Lameroo_2022\animal_logs\raw_data\db_trial_csiro_lemaroo_mob_287_filtered.csv"
 
 
 ## Data manipulation notes.
 
-step 1 
+# step 1 
+
+- **use step 1 scripts**
+
+  "C:\Users\ouz001\working_from_home_post_Sep2022\VF_Sheep_Lameroo\animal_logs\step1_VF_animal_logs.R"
+  
+  This is in the GitHub repository too.
+  
+  https://github.com/JackieOuzman/VF_Sheep_Lameroo
+
+- This does a few things and its a bit messey at time but this is what the script will do:
+- Imports in raw data 
+- Formats timeOfEvent clm to be GMT
+- Creates local time clm, date clm, DOY clm.
+- Creates sheep_ID clm using deviceName using table listed above (inputs supplied by Sue)
+- Note that sheep 2 has two deviceName so there is a bit of stuffing around here
+- Remove any data entries with no GPS logs
+- Turn into spatial data and transform to ESPG 28354 (GDA/MGA zone 54)
+- Filter out (remove) data before training period and after end of the trial, this is detailed above, 17/10/22 11:40 to 21/10/22 11:50
+
+
+This data is saved 
+
+\\FSSA2-ADL\clw-share1\Microlab\VF\Sheep_Lameroo_2022\animal_logs\jax_working\animals_GPS_trim_time_step1.csv
+
+
+```{r step 1 data for plot, message=FALSE, warning=FALSE, include=FALSE}
+
+
+step1 <- read_csv("W:/VF/Sheep_Lameroo_2022/animal_logs/jax_working/animals_GPS_trim_time_step1.csv")
+
+#turn into spatial data
+step1_sf <-   st_as_sf(step1,
+           coords = c("X", "Y"),
+           crs = 28354,
+           agr = "constant")
+
+############################################################################################
+############                  bring in boundaries             ##############################
+############################################################################################
+
+
+
+Lameroo_Vf_area_hard_fence_bound <- st_read("W:/VF/Sheep_Lameroo_2022/spatial_boundary/VF_working/HF_Lameroo_rough_proj.shp")  # this is the hard fences
+Lameroo_Vf_area_hard_fence_bound_buff <- st_read("W:/VF/Sheep_Lameroo_2022/spatial_boundary/HF_Lameroo_rough_10_proj.shp")  # this is the 
+
+Lameroo_Vf_area <-                  st_read("W:/VF/Sheep_Lameroo_2022/spatial_boundary/VF_proj.shp")
+Lameroo_Vf_area_buffer_10 <-                  st_read("W:/VF/Sheep_Lameroo_2022/spatial_boundary/VF_Buffer10_proj.shp")
+water_pt <-  st_read("W:/VF/Sheep_Lameroo_2022/spatial_boundary/water_pts.shp")
+
+
+
+
+
+Lameroo_Vf_area_hard_fence_bound <-
+  st_transform(Lameroo_Vf_area_hard_fence_bound, crs = 28354)
+
+Lameroo_Vf_area_buffer_10 <-
+  st_transform(Lameroo_Vf_area_buffer_10, crs = 28354)
+Lameroo_Vf_area <-
+  st_transform(Lameroo_Vf_area, crs = 28354)
+water_pt <-
+  st_transform(water_pt, crs = 28354)
+
+Lameroo_Vf_area_hard_fence_bound_buff<-
+  st_transform(Lameroo_Vf_area_hard_fence_bound_buff, crs = 28354)
+
+
+
+
+```
+
+
+```{r step 1  plot, echo=FALSE, message=FALSE, warning=FALSE}
+
+ggplot() +
+  geom_sf(data = Lameroo_Vf_area_hard_fence_bound, color = "black", fill = NA) +
+  geom_sf(data = Lameroo_Vf_area, color = "black", fill = NA) +
+  geom_sf(data = Lameroo_Vf_area_buffer_10, color = "black", fill = NA) +
+  geom_sf(data = water_pt ,color ="Blue") +
+  geom_sf(data = step1_sf ,alpha = 0.05) +
+  facet_wrap(.~ date)+
+  theme_bw()+
+  theme(legend.position = "none",
+        axis.ticks = element_blank(), axis.text.x = element_blank(), axis.text.y = element_blank())+
+  labs(title = "All animal logs between 17th at 11:40 and 21st at 11:50",
+  subtitle = "log when animals were yarded removed")
+
+
+```
+
+
+
+
 step 2
 step 3
 
