@@ -70,11 +70,60 @@ check <-
 
 
 ## TASK Mean audio/pulse ratio AIM: Across all animals
-
+names(step1_2_3_sf)
 
 summary_audio_ratio <- step1_2_3_sf %>% 
-  group_by()
+  group_by(Sheep_ID, date, training_period) %>% 
+  summarise(audio_sum = sum(Audio_values, na.rm = TRUE),
+            pulse_sum = sum(Shock_values, na.rm = TRUE),
+            ratio_sum1 = audio_sum/ (pulse_sum+audio_sum )*100,
+            ratio_sum2 = pulse_sum/ (audio_sum )*100)
+  
+summary_audio_ratio <- summary_audio_ratio %>% 
+  ungroup(summary_audio_ratio) %>% 
+  dplyr::select(-geometry)
+names(summary_audio_ratio)
 
+summary_audio_ratio$ratio_sum1 [is.nan(summary_audio_ratio$ratio_sum1 )]<-NA
+summary_audio_ratio$ratio_sum2 [is.nan(summary_audio_ratio$ratio_sum2 )]<-NA
+
+names(summary_audio_ratio)
+summary_audio_ratio %>%
+  filter(training_period == "non_training") %>% 
+  ggplot(aes(x = date , y = ratio_sum1)) +
+  geom_col()+
+  theme_classic() +
+  facet_wrap(.~Sheep_ID)+
+  theme(axis.text.x = element_text(angle = 90))+
+  #geom_vline(xintercept = as.Date(vertical_lines), col = "blue")+
+  labs(
+    x = "Date",
+    y = "ratio (Audio / pulse+audio)*100 ",
+    title = paste("Animals fitted with VF collars")
+  )
+
+
+
+
+summary_audio_ratio_from_training <- summary_audio_ratio %>% 
+  group_by(training_period) %>% 
+  summarise(audio_av = mean(audio_sum, na.rm = TRUE),
+            pulse_av = mean(pulse_sum, na.rm = TRUE),
+            ratio_1_mean = mean(ratio_sum1, na.rm= TRUE),
+            ratio_2_mean = mean(ratio_sum2, na.rm= TRUE))
+            
+
+summary_audio_ratio_from_training %>%
+  ggplot(aes(x = training_period , y = audio_av)) +
+  geom_col()+
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 90))+
+  #geom_vline(xintercept = as.Date(vertical_lines), col = "blue")+
+  labs(
+    x = "Traing period",
+    y = "Avearge Audio ",
+    title = paste("Average Audio in training period and during trial")
+  )
 
 
 ################################################################################
