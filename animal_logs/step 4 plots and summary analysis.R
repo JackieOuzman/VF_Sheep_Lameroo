@@ -73,7 +73,7 @@ check <-
 
 
 summary_audio_ratio <- step1_2_3_sf %>% 
-  group
+  group_by()
 
 
 
