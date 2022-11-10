@@ -10,7 +10,7 @@ library(sf)
 
 ## this code takes the cleaned data and splits it into animals and converts the cumm value into counts
 
-path_output_files <- "W:/VF/Sheep_Lameroo_2022/animal_logs/jax_working/"
+path_output_files <- "W:/VF/Sheep_Chiswick_2022/animal_logs/jax_working/"
 VF_animals_logs <- read_csv(paste0(path_output_files,"animals_GPS_trim_time_step1.csv"))
 names(VF_animals_logs)
 
@@ -54,20 +54,14 @@ list_animals <-ungroup(list_animals)
 
 list_animals$deviceName[1:34]
 list_animals <- c(
- 490705,
-1390182,
-1390456,
-1390577,
-1390581,
-1390737,
-1390743,
-1390749,
-1390736,
-1390826,
-1391505
+  #9380422 (missing it has NULL fence ID values)
+  9380265,
+  9380451,
+  9380674,
+  9380743 
   )
 
-
+### ------------ UP TO HERE MISSING AUDIO DATA ---------------######
 
 for (list_animals in list_animals){
   
