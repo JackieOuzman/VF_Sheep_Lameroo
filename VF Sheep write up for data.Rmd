@@ -235,10 +235,14 @@ For example in the 10 min window the animals has spent 37% of the time resting, 
 - Formats timeOfEvent clm to be GMT
 - Creates local time clm, date clm, DOY clm.
 - Creates sheep_ID clm using deviceName using table listed above (inputs supplied by Sue)
+- Only keeps records with deviceName matching Sues list
+- Removes records with fenceID = NULL
 - Note that sheep 2 has two deviceName so there is a bit of stuffing around here
 - Remove any data entries with no GPS logs
 - Turn into spatial data and transform to ESPG 28354 (GDA/MGA zone 54)
 - Filter out (remove) data before training period and after end of the trial, this is detailed above, 17/10/22 11:40 to 21/10/22 11:50
+- Also removes any data entries that occur during yarding times, when daily checks were done.
+
 
 
 This data is saved 
@@ -520,13 +524,16 @@ summary_audio_ratio_from_training <- summary_audio_ratio_from_training %>%dplyr:
                 SE_Av_std_dev_Av_Ratio_2)
 
 
-DT::datatable(summary_audio_ratio_from_training ,
-              rownames = FALSE,  
-              options = list(columnDefs =
-                               list(list(className = 'dt-center',
-                                         targets = "_all")))) %>%
-  formatRound(c(2:13), 2) #this round clm number  to 2 decimal places
-  
+summary_audio_ratio_from_training_long <- summary_audio_ratio_from_training %>% 
+  pivot_longer(cols=c('audio_av':"SE_Av_std_dev_Av_Ratio_2"),
+               names_to='cue',
+               values_to='value')
+
+DT::datatable(summary_audio_ratio_from_training_long)%>%
+   formatRound(3, 2) #this round clm number  to 2 decimal places
+
+
+#   
  
 
 ```
