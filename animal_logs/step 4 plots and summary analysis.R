@@ -13,35 +13,41 @@ library(sf)
 ############                  bring in boundaries             ##############################
 ############################################################################################
 
-Chiswick_hard_fence_bound <- st_read("W:/VF/Sheep_Chiswick_2022/spatial_boundaries/Chiswick_paddock_boundary_final.shp")  # this is the hard fences
+Lameroo_Vf_area_hard_fence_bound <- st_read("W:/VF/Sheep_Lameroo_2022/spatial_boundary/VF_working/HF_Lameroo_rough_proj.shp")  # this is the hard fences
+Lameroo_Vf_area_hard_fence_bound_buff <- st_read("W:/VF/Sheep_Lameroo_2022/spatial_boundary/HF_Lameroo_rough_10_proj.shp")  # this is the 
 
-Chiswick_hard_fence_bound <-
-  st_transform(Chiswick_hard_fence_bound, crs = 28355)
-
-
-Chiswick_hard_fence_bound_buff <- st_read("W:/VF/Sheep_Chiswick_2022/spatial_boundaries/Chiswick_paddock_boundary_final_buff10.shp")  # this is the 
-
-Chiswick_hard_fence_bound_buff <-
-  st_transform(Chiswick_hard_fence_bound_buff, crs = 28355)
+Lameroo_Vf_area <-                  st_read("W:/VF/Sheep_Lameroo_2022/spatial_boundary/VF_proj.shp")
+Lameroo_Vf_area_buffer_10 <-                  st_read("W:/VF/Sheep_Lameroo_2022/spatial_boundary/VF_Buffer10_proj.shp")
+water_pt <-  st_read("W:/VF/Sheep_Lameroo_2022/spatial_boundary/water_pts.shp")
 
 
-VF_paddock <-   st_read("W:/VF/Sheep_Chiswick_2022/spatial_boundaries/VF_paddock.shp")
 
-VF_paddock <-  st_transform(VF_paddock, crs = 28355)
 
-#water_pt <-  st_read("W:/VF/Sheep_Lameroo_2022/spatial_boundary/water_pts.shp")
+
+Lameroo_Vf_area_hard_fence_bound <-
+  st_transform(Lameroo_Vf_area_hard_fence_bound, crs = 28354)
+
+Lameroo_Vf_area_buffer_10 <-
+  st_transform(Lameroo_Vf_area_buffer_10, crs = 28354)
+Lameroo_Vf_area <-
+  st_transform(Lameroo_Vf_area, crs = 28354)
+water_pt <-
+  st_transform(water_pt, crs = 28354)
+
+Lameroo_Vf_area_hard_fence_bound_buff<-
+  st_transform(Lameroo_Vf_area_hard_fence_bound_buff, crs = 28354)
 
 
 ###########################################################################################
 ############                  bring in step 1 2 and 3 df             ##############################
 ############################################################################################
 
-step1_2_3 <- read_csv("W:/VF/Sheep_Chiswick_2022/animal_logs/jax_working/animal_GPS_data_step1_2_3.csv")
+step1_2_3 <- read_csv("W:/VF/Sheep_Lameroo_2022/animal_logs/jax_working/animal_GPS_data_step1_2_3.csv")
 
 #turn into spatial data
 step1_2_3_sf <-   st_as_sf(step1_2_3,
                        coords = c("X", "Y"),
-                       crs = 28355,
+                       crs = 28354,
                        agr = "constant")
 
 
@@ -263,9 +269,10 @@ summary_audio_ratio_per_animal_long %>%
 
 
 plot1 <- ggplot() +
-  geom_sf(data = Chiswick_hard_fence_bound, color = "black", fill = NA) +
-  geom_sf(data = VF_paddock, color = "black", fill = NA) +
-  #geom_sf(data = water_pt ,color ="Blue") +
+  geom_sf(data = Lameroo_Vf_area_hard_fence_bound, color = "black", fill = NA) +
+  geom_sf(data = Lameroo_Vf_area, color = "black", fill = NA) +
+  geom_sf(data = Lameroo_Vf_area_buffer_10, color = "black", fill = NA, linetype = "dashed", size = 0.5) +
+  geom_sf(data = water_pt ,color ="Blue") +
   
   
   geom_sf(data = step1_2_3_sf ,alpha = 0.05) +
@@ -283,7 +290,7 @@ plot1
 ggsave(plot1,
        device = "png",
        filename = paste0("plot1.png"),
-       path= "W:/VF/Sheep_Chiswick_2022/plots/",
+       path= "W:/VF/Sheep_Lameroo_2022/R_scripts/plots/",
        width=8.62,
        height = 6.28,
        dpi=600
