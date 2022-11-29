@@ -277,13 +277,15 @@ step1_2_3_sf <- step1_2_3_sf %>%
       DOY == 292 ~ "Day 3",
       DOY == 293 ~ "Day 4",
       DOY == 294 ~ "Day 5"))
+step1_2_3_sf_trial_only <- step1_2_3_sf %>% 
+  filter(training_period == "non_training")
 plot1 <- ggplot() +
-     geom_sf(data = Lameroo_Vf_area_hard_fence_bound, color = "black", fill = NA) +
-     geom_sf(data = Lameroo_Vf_area, color = "black", fill = NA) +
-     geom_sf(data = Lameroo_Vf_area_buffer_10, color = "black", fill = NA, linetype = "dashed", size = 0.5) +
-     geom_sf(data = water_pt ,color ="Blue") +
-     
-  geom_sf(data = step1_2_3_sf ,alpha = 0.2) +
+  geom_sf(data = Lameroo_Vf_area_hard_fence_bound, color = "black", fill = NA) +
+  geom_sf(data = Lameroo_Vf_area, color = "black", fill = NA) +
+  geom_sf(data = Lameroo_Vf_area_buffer_10, color = "black", fill = NA, linetype = "dashed", size = 0.5) +
+  geom_sf(data = water_pt ,color ="Blue") +
+  
+  geom_sf(data = step1_2_3_sf_trial_only ,alpha = 0.2) +
   facet_wrap(.~ Day_of_Trial)+
   theme_bw()+
   theme(legend.position = "none",
