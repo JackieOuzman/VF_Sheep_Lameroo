@@ -201,11 +201,11 @@ count_entries_per_sheep <- count_entries_per_sheep %>%
 count_entries_per_sheep <- ungroup(count_entries_per_sheep)
 count_entries_per_sheep <- count_entries_per_sheep %>%  
   dplyr::select(Sheep_ID, date, n, Time_in_exclusion_zone_19, D_Time_in_exclusion_zone_19)  
-
+count_entries_per_sheep
 ##############################################################
 sum_clm <- count_entries_per_sheep %>% summarize_if(is.numeric, sum, na.rm=TRUE)
 sum_clm
-#sum_clm$D_Time_in_exclusion_zone_19 <- duration(num = count_entries_per_sheep_sum_clm$Time_in_exclusion_zone_19, units = "seconds")
+
 
 Time_in_exclusion_zone <- count_entries_per_sheep_sum_clm
 # Time_in_exclusion_zone <- count_entries_per_sheep_sum_clm$Time_in_exclusion_zone_19
