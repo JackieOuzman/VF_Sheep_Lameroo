@@ -539,6 +539,80 @@ DT::datatable(summary_audio_ratio_from_training_long)%>%
 ```
 
 
+```{r cue plots summary table by day, echo=FALSE, message=FALSE, warning=FALSE}
+
+summary_audio_ratio_from_training_date <- summary_audio_ratio %>% 
+  dplyr::group_by(training_period, date) %>% 
+  dplyr::summarise(audio_av = mean(audio_sum, na.rm = TRUE),
+                   pulse_av = mean(pulse_sum, na.rm = TRUE),
+                   
+                   std_dev_Av_Audio = sd(audio_sum, na.rm = TRUE),
+                   SE_Av_Audio = std_dev_Av_Audio / sqrt(n()),
+                   
+                   std_dev_Av_Pulse = sd(pulse_sum, na.rm = TRUE),
+                   SE_Av_Pulse = std_dev_Av_Pulse / sqrt(n()),
+                   
+                   ratio_1_mean = mean(ratio_sum1, na.rm= TRUE),
+                   ratio_2_mean = mean(ratio_sum2, na.rm= TRUE),
+                   
+                   std_dev_Av_Ratio_1 = sd(ratio_sum1, na.rm = TRUE),
+                   SE_Av_std_dev_Av_Ratio_1 = std_dev_Av_Ratio_1 / sqrt(n()),
+                   
+                   std_dev_Av_Ratio_2 = sd(ratio_sum2, na.rm = TRUE),
+                   SE_Av_std_dev_Av_Ratio_2 = std_dev_Av_Ratio_2 / sqrt(n())
+                   
+  )
+
+
+
+summary_audio_ratio_from_training_date$training_period <- factor(summary_audio_ratio_from_training_date$training_period,
+                                                            levels = c("training", "non_training"))
+
+
+summary_audio_ratio_from_training_date <- as.data.frame(summary_audio_ratio_from_training_date)
+
+str(summary_audio_ratio_from_training_date)
+
+summary_audio_ratio_from_training_date <-
+  summary_audio_ratio_from_training_date %>% dplyr::select(
+    training_period ,
+    date,
+    audio_av ,
+    pulse_av  ,
+    std_dev_Av_Audio ,
+    SE_Av_Audio ,
+    std_dev_Av_Pulse ,
+    SE_Av_Pulse,
+    ratio_1_mean  ,
+    ratio_2_mean ,
+    std_dev_Av_Ratio_1  ,
+    SE_Av_std_dev_Av_Ratio_1 ,
+    std_dev_Av_Ratio_2,
+    SE_Av_std_dev_Av_Ratio_2
+  )
+
+
+
+table_per_day_cues_pulses <-summary_audio_ratio_from_training_date %>% dplyr::select(
+  date,
+  training_period ,
+  audio_av ,
+  std_dev_Av_Audio ,
+  pulse_av  ,
+  std_dev_Av_Pulse 
+  ) %>% 
+  arrange(date,training_period )
+
+table_per_day_cues_pulses$std_dev_Av_Audio <- round(table_per_day_cues_pulses$std_dev_Av_Audio,2)
+table_per_day_cues_pulses$std_dev_Av_Pulse <- round(table_per_day_cues_pulses$std_dev_Av_Pulse,2)  
+
+#write.csv(table_per_day_cues_pulses, "W:/VF/Sheep_Lameroo_2022/R_scripts/plots/table_per_day_cues_pulses.csv",row.names = FALSE)
+ DT::datatable(table_per_day_cues_pulses)
+
+
+```
+
+
 ## GPS Plots
 
 AIM: Daily plots are probably sufficient. 

@@ -186,5 +186,114 @@ ggsave(day4,
        dpi=600
 )
        
-       
+  
+
+
+
+###########################################################################
+
+
+
+## Cue data again - 
+
+
+
+step1_2_3 <- read_csv("W:/VF/Sheep_Lameroo_2022/animal_logs/jax_working/animal_GPS_data_step1_2_3.csv")
+
+#turn into spatial data
+step1_2_3_sf <-   st_as_sf(step1_2_3,
+                           coords = c("X", "Y"),
+                           crs = 28354,
+                           agr = "constant")
+
+# step 1 summaries audio and pulse per animal per day also training period 
+summary_audio_ratio <- step1_2_3_sf %>% 
+  dplyr::group_by(Sheep_ID, date, training_period) %>% 
+  dplyr::summarise(audio_sum = sum(Audio_values, na.rm = TRUE),
+                   pulse_sum = sum(Shock_values, na.rm = TRUE),
+                   ratio_sum1 = audio_sum/ (pulse_sum+audio_sum )*100,
+                   ratio_sum2 = pulse_sum/ (audio_sum )*100)
+
+
+
+summary_audio_ratio$ratio_sum1 [is.nan(summary_audio_ratio$ratio_sum1 )]<-NA
+summary_audio_ratio$ratio_sum2 [is.nan(summary_audio_ratio$ratio_sum2 )]<-NA
+
+names(summary_audio_ratio)
+
+
+summary_audio_ratio <- ungroup(summary_audio_ratio)
+
+summary_audio_ratio
+# step 2 summaries audio and pulse per animal per day also training period 
+
+summary_audio_ratio_from_training_date <- summary_audio_ratio %>% 
+  dplyr::group_by(training_period, date) %>% 
+  dplyr::summarise(audio_av = mean(audio_sum, na.rm = TRUE),
+                   pulse_av = mean(pulse_sum, na.rm = TRUE),
+                   
+                   std_dev_Av_Audio = sd(audio_sum, na.rm = TRUE),
+                   SE_Av_Audio = std_dev_Av_Audio / sqrt(n()),
+                   
+                   std_dev_Av_Pulse = sd(pulse_sum, na.rm = TRUE),
+                   SE_Av_Pulse = std_dev_Av_Pulse / sqrt(n()),
+                   
+                   ratio_1_mean = mean(ratio_sum1, na.rm= TRUE),
+                   ratio_2_mean = mean(ratio_sum2, na.rm= TRUE),
+                   
+                   std_dev_Av_Ratio_1 = sd(ratio_sum1, na.rm = TRUE),
+                   SE_Av_std_dev_Av_Ratio_1 = std_dev_Av_Ratio_1 / sqrt(n()),
+                   
+                   std_dev_Av_Ratio_2 = sd(ratio_sum2, na.rm = TRUE),
+                   SE_Av_std_dev_Av_Ratio_2 = std_dev_Av_Ratio_2 / sqrt(n())
+                   
+  )
+
+
+
+summary_audio_ratio_from_training_date$training_period <- factor(summary_audio_ratio_from_training_date$training_period,
+                                                            levels = c("training", "non_training"))
+
+
+summary_audio_ratio_from_training_date <- as.data.frame(summary_audio_ratio_from_training_date)
+
+str(summary_audio_ratio_from_training_date)
+
+summary_audio_ratio_from_training_date <-
+  summary_audio_ratio_from_training_date %>% dplyr::select(
+    training_period ,
+    date,
+    audio_av ,
+    pulse_av  ,
+    std_dev_Av_Audio ,
+    SE_Av_Audio ,
+    std_dev_Av_Pulse ,
+    SE_Av_Pulse,
+    ratio_1_mean  ,
+    ratio_2_mean ,
+    std_dev_Av_Ratio_1  ,
+    SE_Av_std_dev_Av_Ratio_1 ,
+    std_dev_Av_Ratio_2,
+    SE_Av_std_dev_Av_Ratio_2
+  )
+
+
+
+table_per_day_cues_pulses <-summary_audio_ratio_from_training_date %>% dplyr::select(
+  date,
+  training_period ,
+  audio_av ,
+  std_dev_Av_Audio ,
+  pulse_av  ,
+  std_dev_Av_Pulse 
+  ) %>% 
+  arrange(date,training_period )
+
+table_per_day_cues_pulses$std_dev_Av_Audio <- round(table_per_day_cues_pulses$std_dev_Av_Audio,2)
+table_per_day_cues_pulses$std_dev_Av_Pulse <- round(table_per_day_cues_pulses$std_dev_Av_Pulse,2)  
+
+write.csv(table_per_day_cues_pulses, "W:/VF/Sheep_Lameroo_2022/R_scripts/plots/table_per_day_cues_pulses.csv",row.names = FALSE)
+
+
+
        
