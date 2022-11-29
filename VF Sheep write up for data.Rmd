@@ -504,6 +504,8 @@ summary_audio_ratio_from_training %>%
 
 
 ```
+Table of cue and pulse data by training and non training period
+
 
 ```{r cue plots summary table, echo=FALSE, message=FALSE, warning=FALSE}
 
@@ -539,6 +541,9 @@ DT::datatable(summary_audio_ratio_from_training_long)%>%
 ```
 
 
+Table of cue and pulse data by day (and training period)
+only subset of data displayed
+
 ```{r cue plots summary table by day, echo=FALSE, message=FALSE, warning=FALSE}
 
 summary_audio_ratio_from_training_date <- summary_audio_ratio %>% 
@@ -571,7 +576,7 @@ summary_audio_ratio_from_training_date$training_period <- factor(summary_audio_r
 
 summary_audio_ratio_from_training_date <- as.data.frame(summary_audio_ratio_from_training_date)
 
-str(summary_audio_ratio_from_training_date)
+
 
 summary_audio_ratio_from_training_date <-
   summary_audio_ratio_from_training_date %>% dplyr::select(
@@ -606,7 +611,7 @@ table_per_day_cues_pulses <-summary_audio_ratio_from_training_date %>% dplyr::se
 table_per_day_cues_pulses$std_dev_Av_Audio <- round(table_per_day_cues_pulses$std_dev_Av_Audio,2)
 table_per_day_cues_pulses$std_dev_Av_Pulse <- round(table_per_day_cues_pulses$std_dev_Av_Pulse,2)  
 
-#write.csv(table_per_day_cues_pulses, "W:/VF/Sheep_Lameroo_2022/R_scripts/plots/table_per_day_cues_pulses.csv",row.names = FALSE)
+write.csv(table_per_day_cues_pulses, "W:/VF/Sheep_Lameroo_2022/R_scripts/plots/table_per_day_cues_pulses.csv",row.names = FALSE)
  DT::datatable(table_per_day_cues_pulses)
 
 
