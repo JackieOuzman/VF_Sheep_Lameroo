@@ -277,8 +277,12 @@ step1_2_3_sf <- step1_2_3_sf %>%
       DOY == 292 ~ "Day 3",
       DOY == 293 ~ "Day 4",
       DOY == 294 ~ "Day 5"))
+
+
 step1_2_3_sf_trial_only <- step1_2_3_sf %>% 
   filter(training_period == "non_training")
+
+
 plot1 <- ggplot() +
   geom_sf(data = Lameroo_Vf_area_hard_fence_bound, color = "black", fill = NA) +
   geom_sf(data = Lameroo_Vf_area, color = "black", fill = NA) +
@@ -299,6 +303,196 @@ plot1
 ggsave(plot1,
        device = "png",
        filename = paste0("plot1.png"),
+       path= "W:/VF/Sheep_Lameroo_2022/R_scripts/plots/",
+       width=8.62,
+       height = 6.28,
+       dpi=600
+)
+
+
+
+################################################################################
+## Rick day night plots
+str(step1_2_3_sf_trial_only)
+
+#use local time to make day night clm
+
+
+step1_2_3_sf_trial_only <- step1_2_3_sf_trial_only  %>% 
+  dplyr::mutate(
+    day_night = case_when(
+      
+      ymd_hms(local_time) > ymd_hms("2022-10-17 06:30:00") & 
+      ymd_hms(local_time) < ymd_hms("2022-10-17 19:30:00")      
+             ~ "Day",
+      
+      ymd_hms(local_time) > ymd_hms("2022-10-18 06:30:00") & 
+        ymd_hms(local_time) < ymd_hms("2022-10-18 19:30:00")      
+      ~ "Day",
+             
+      ymd_hms(local_time) > ymd_hms("2022-10-19 06:30:00") & 
+        ymd_hms(local_time) < ymd_hms("2022-10-19 19:30:00")      
+      ~ "Day",
+      
+      ymd_hms(local_time) > ymd_hms("2022-10-20 06:30:00") & 
+        ymd_hms(local_time) < ymd_hms("2022-10-20 19:30:00")      
+      ~ "Day",
+     
+      ymd_hms(local_time) > ymd_hms("2022-10-21 06:30:00") & 
+        ymd_hms(local_time) < ymd_hms("2022-10-21 19:30:00")      
+      ~ "Day",        
+      
+             TRUE                      ~ "Night"
+      
+             ))
+
+
+day_night_plot <- ggplot() +
+  geom_sf(data = Lameroo_Vf_area_hard_fence_bound, color = "black", fill = NA) +
+  geom_sf(data = Lameroo_Vf_area, color = "black", fill = NA) +
+  geom_sf(data = Lameroo_Vf_area_buffer_10, color = "black", fill = NA, linetype = "dashed", size = 0.5) +
+  geom_sf(data = water_pt ,color ="Blue") +
+  
+  geom_sf(data = step1_2_3_sf_trial_only ,alpha = 0.2) +
+  facet_wrap(Day_of_Trial~ day_night,  nrow = 2)+
+  
+  theme_bw()+
+  theme(legend.position = "none",
+        axis.ticks = element_blank(), axis.text.x = element_blank(), axis.text.y = element_blank())#+
+# labs(title = "Animal logs",
+#              subtitle = "log when animals were yarded removed, and clipped to 10 meter buffer")
+day_night_plot
+
+
+ggsave(day_night_plot,
+       device = "png",
+       filename = paste0("day_night_plot.png"),
+       path= "W:/VF/Sheep_Lameroo_2022/R_scripts/plots/",
+       width=8.62,
+       height = 6.28,
+       dpi=600
+)
+
+
+
+################################################################################
+#### rapid movement on day 4 between midnight and 1 am
+
+str(step1_2_3_sf_trial_only)
+step1_2_3_sf_trial_only <- step1_2_3_sf_trial_only %>% 
+  mutate(hour = hour(local_time),
+         minute = minute(local_time))
+step1_2_3_sf_trial_only <- step1_2_3_sf_trial_only %>% 
+  mutate(hours_format1 = case_when(
+    hour ==  1 ~ "1 am", 
+    hour ==  2 ~ "2 am", 
+    hour ==  3 ~ "3 am", 
+    hour ==  4 ~ "4 am",
+    hour ==  5 ~ "5 am", 
+    hour ==  6 ~ "6 am", 
+    hour ==  7 ~ "7 am", 
+    hour ==  8 ~ "8 am", 
+    hour ==  9 ~ "9 am", 
+    hour ==  10 ~ "10 am", 
+    hour ==  11 ~ "11 am", 
+    hour ==  12 ~ "Midday", 
+    hour ==  13 ~ "1 pm", 
+    hour ==  14 ~ "2 pm", 
+    hour ==  15 ~ "3 pm", 
+    hour ==  16 ~ "4 pm", 
+    hour ==  17 ~ "5 pm", 
+    hour ==  18 ~ "6 pm", 
+    hour ==  19 ~ "7 pm", 
+    hour ==  20 ~ "8 pm", 
+    hour ==  21 ~ "9 pm", 
+    hour ==  22 ~ "10 pm", 
+    hour ==  23 ~ "11 pm",
+    hour ==  0 ~ "Midnight" )
+  )
+
+
+step1_2_3_sf_trial_only$hours_format1 <-
+  factor(
+    step1_2_3_sf_trial_only$hours_format1,
+    levels = c(
+      "Midnight",
+      "1 am",
+      "2 am",
+      "3 am",
+      "4 am",
+      "5 am",
+      "6 am",
+      "7 am",
+      "8 am",
+      "9 am",
+      "10 am",
+      "11 am",
+      "Midday",
+      "1 pm",
+      "2 pm",
+      "3 pm",
+      "4 pm",
+      "5 pm",
+      "6 pm",
+      "7 pm",
+      "8 pm",
+      "9 pm",
+      "10 pm",
+      "11 pm"
+      
+    )
+  )
+
+
+
+day_4_scare <- step1_2_3_sf_trial_only %>% filter( Day_of_Trial == "Day 4")
+ 
+
+day_4_scare_time <- day_4_scare %>%  
+  filter(local_time >= ymd_hms("2022-10-20 00:00:00", tz= "Australia/Adelaide"), #yyy-mm-dd hh:mm:ss
+         local_time <=  ymd_hms("2022-10-20 02:00:00", tz= "Australia/Adelaide"))
+
+
+str(day_4_scare_time)
+
+day_4_scare_time$minute <- as.factor(day_4_scare_time$minute)
+unique(day_4_scare_time$minute)
+
+
+
+day_4_scare_time <- day_4_scare_time %>% 
+  mutate(min_format1 = case_when(
+    minute ==  1 ~   "00:00", 
+    minute ==  11 ~  "10:00", 
+    minute ==  21 ~  "20:00", 
+    minute ==  31 ~  "30:00",
+    minute ==  41 ~  "40:00", 
+    minute ==  51 ~  "50:00" 
+     )
+  )
+
+
+str(day_4_scare)
+
+
+day_4_scare_plot <- ggplot() +
+  geom_sf(data = Lameroo_Vf_area_hard_fence_bound, color = "black", fill = NA) +
+  geom_sf(data = Lameroo_Vf_area, color = "black", fill = NA) +
+  geom_sf(data = Lameroo_Vf_area_buffer_10, color = "black", fill = NA, linetype = "dashed", size = 0.5) +
+  geom_sf(data = water_pt ,color ="Blue") +
+  
+  geom_sf(data = day_4_scare_time ,alpha = 0.2) +
+  facet_wrap( hours_format1 ~ min_format1  ,  nrow = 2)+
+  
+  theme_bw()+
+  theme(legend.position = "none",
+        axis.ticks = element_blank(), axis.text.x = element_blank(), axis.text.y = element_blank())#+
+day_4_scare_plot
+
+
+ggsave(day_4_scare_plot,
+       device = "png",
+       filename = paste0("day_4_scare_plot.png"),
        path= "W:/VF/Sheep_Lameroo_2022/R_scripts/plots/",
        width=8.62,
        height = 6.28,
