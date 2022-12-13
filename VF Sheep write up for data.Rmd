@@ -614,6 +614,14 @@ table_per_day_cues_pulses$std_dev_Av_Pulse <- round(table_per_day_cues_pulses$st
 write.csv(table_per_day_cues_pulses, "W:/VF/Sheep_Lameroo_2022/R_scripts/plots/table_per_day_cues_pulses.csv",row.names = FALSE)
  DT::datatable(table_per_day_cues_pulses)
 
+ 
+ #Write out input data fro chceking
+summary_audio_ratio <- ungroup(summary_audio_ratio)
+summary_audio_ratio_df <- as.data.frame(summary_audio_ratio)
+summary_audio_ratio_df <- summary_audio_ratio_df %>% 
+  dplyr::select(-"geometry")
+
+# write.csv( summary_audio_ratio_df, #"W:/VF/Sheep_Lameroo_2022/R_scripts/plots/Pre_data_to_table_per_day_cues_pulses.csv",row.names = FALSE)
 
 ```
 
