@@ -775,7 +775,7 @@ day1 <- ggplot() +
   geom_sf(data = step1_2_3_sf_day1_Non_training ,alpha = 0.08, color = "black") +
   
   theme_bw()+
-  facet_wrap(. ~ hours_format1)+
+  facet_wrap(. ~ hours_format1, nrow=2)+
   theme(axis.ticks = element_blank(), axis.text.x = element_blank(), axis.text.y = element_blank())#+
 #labs(title = "Animal logs on first day")
 day1

@@ -1,5 +1,95 @@
 ### run step 4 plots and summary first so you have all the files in your environment
 
+library(dplyr)
+library(tidyverse)
+library(readr)
+library(lubridate)
+library(DT)
+library(sp)
+
+
+library(rgdal)
+library(sf)
+
+#install.packages("plotKML")
+library(plotKML)
+library(knitr)
+library(png)
+
+library(readxl)
+
+
+library(ggmap)
+library(maps)
+library(mapdata)
+
+library(raster)
+library(agricolae)
+library(FSA) 
+library(agricolae)
+library(multcomp)
+library(lsmeans)
+#library(hms) Add these before I use them?
+#library(plyr)
+
+library(readxl)
+library(tidyverse)
+library(dplyr)
+library(FSA) 
+library(agricolae)
+library(multcomp)
+library(multcomp)
+library(lsmeans)
+library(multcompView)
+library(Rmisc)
+
+library(ggplot2)
+library(car)
+library(DescTools)
+
+
+
+############################################################################################
+############                  bring in boundaries             ##############################
+############################################################################################
+
+
+
+Lameroo_Vf_area_hard_fence_bound <- st_read("W:/VF/Sheep_Lameroo_2022/spatial_boundary/VF_working/HF_Lameroo_rough_proj.shp")  # this is the hard fences
+Lameroo_Vf_area_hard_fence_bound_buff <- st_read("W:/VF/Sheep_Lameroo_2022/spatial_boundary/HF_Lameroo_rough_10_proj.shp")  # this is the 
+
+Lameroo_Vf_area <-                  st_read("W:/VF/Sheep_Lameroo_2022/spatial_boundary/VF_proj.shp")
+Lameroo_Vf_area_buffer_10 <-                  st_read("W:/VF/Sheep_Lameroo_2022/spatial_boundary/VF_Buffer10_proj.shp")
+water_pt <-  st_read("W:/VF/Sheep_Lameroo_2022/spatial_boundary/water_pts.shp")
+
+
+
+
+
+Lameroo_Vf_area_hard_fence_bound <-
+  st_transform(Lameroo_Vf_area_hard_fence_bound, crs = 28354)
+
+Lameroo_Vf_area_buffer_10 <-
+  st_transform(Lameroo_Vf_area_buffer_10, crs = 28354)
+Lameroo_Vf_area <-
+  st_transform(Lameroo_Vf_area, crs = 28354)
+water_pt <-
+  st_transform(water_pt, crs = 28354)
+
+Lameroo_Vf_area_hard_fence_bound_buff<-
+  st_transform(Lameroo_Vf_area_hard_fence_bound_buff, crs = 28354)
+
+
+
+
+step1_2_3 <- read_csv("W:/VF/Sheep_Lameroo_2022/animal_logs/jax_working/animal_GPS_data_step1_2_3.csv")
+
+#turn into spatial data
+step1_2_3_sf <-   st_as_sf(step1_2_3,
+                           coords = c("X", "Y"),
+                           crs = 28354,
+                           agr = "constant")
+
 ### comments from Caroline 29/11/2022
 
 step1_2_3_sf_day1 <- step1_2_3_sf %>% filter(date=="2022-10-17")
@@ -67,7 +157,7 @@ day1 <- ggplot() +
   geom_sf(data = step1_2_3_sf_day1_Non_training ,alpha = 0.08, color = "black") +
   
   theme_bw()+
-  facet_wrap(. ~ hours_format1)+
+  facet_wrap(. ~ hours_format1, nrow=2)+
   theme(axis.ticks = element_blank(), axis.text.x = element_blank(), axis.text.y = element_blank())#+
 #labs(title = "Animal logs on first day")
 day1
