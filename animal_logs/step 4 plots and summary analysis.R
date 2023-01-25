@@ -8,6 +8,8 @@ library(DT)
 library(sp)
 #install.packages("sf")
 library(sf)
+library("ggspatial")
+library("ggsn")
 
 ############################################################################################
 ############                  bring in boundaries             ##############################
@@ -284,14 +286,27 @@ step1_2_3_sf_trial_only <- step1_2_3_sf %>%
 
 
 plot1 <- ggplot() +
-  geom_sf(data = Lameroo_Vf_area_hard_fence_bound, color = "black", fill = NA) +
-  geom_sf(data = Lameroo_Vf_area, color = "black", fill = NA) +
-  geom_sf(data = Lameroo_Vf_area_buffer_10, color = "black", fill = NA, linetype = "dashed", size = 0.5) +
+  geom_sf(data = Lameroo_Vf_area, color = "red", fill = NA) +
+  geom_sf(data = Lameroo_Vf_area_hard_fence_bound, color = "black", fill = NA,  linewidth = 0.75) +
+  geom_sf(data = Lameroo_Vf_area_hard_fence_bound_buff, color = "black", fill = NA, linetype = "dashed", size = 0.5) +
   geom_sf(data = water_pt ,color ="Blue") +
   
   geom_sf(data = step1_2_3_sf_trial_only ,alpha = 0.2) +
   facet_wrap(.~ Day_of_Trial)+
   theme_bw()+
+  
+  annotation_scale(pad_x = unit(3.5, "cm"),
+                   pad_y = unit(0.2, "cm"),
+                   width_hint = 0.3,
+                   height = unit(0.09, "cm")) +
+  
+  
+  annotation_north_arrow( pad_x = unit(5.0, "cm"),
+                          pad_y = unit(0.5, "cm"),
+                          height = unit(0.5, "cm"),
+                          width = unit(0.5, "cm"),
+                          which_north = "true",
+                          style = north_arrow_orienteering( text_size = 8))+
   theme(legend.position = "none",
         axis.ticks = element_blank(), axis.text.x = element_blank(), axis.text.y = element_blank())#+
 # labs(title = "Animal logs",
@@ -309,7 +324,7 @@ ggsave(plot1,
        dpi=600
 )
 
-
+## nb I also saved using the export button on the viewer pane.
 
 
 

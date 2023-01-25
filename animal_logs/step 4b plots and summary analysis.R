@@ -146,17 +146,30 @@ step1_2_3_sf_day1_training <-step1_2_3_sf_day1 %>%  filter(training_period == "t
 step1_2_3_sf_day1_Non_training <-step1_2_3_sf_day1 %>%  filter(training_period == "non_training")
 
 day1 <- ggplot() +
-  geom_sf(data = Lameroo_Vf_area_hard_fence_bound, color = "black", fill = NA) +
+  geom_sf(data = Lameroo_Vf_area, color = "red", fill = NA) +
+  geom_sf(data = Lameroo_Vf_area_hard_fence_bound, color = "black", fill = NA, linewidth = 0.75) +
   geom_sf(data = Lameroo_Vf_area_hard_fence_bound_buff, color = "black",linetype = "dotted", size = 0.5, fill = NA) +
   
-  geom_sf(data = Lameroo_Vf_area, color = "black", fill = NA) +
+  
   geom_sf(data = water_pt ,color ="Blue") +
   geom_sf(data = step1_2_3_sf_day1 ,alpha = 0.08) +
   
-  geom_sf(data = step1_2_3_sf_day1_training ,alpha = 0.08, color = "red") +
-  geom_sf(data = step1_2_3_sf_day1_Non_training ,alpha = 0.08, color = "black") +
+  geom_sf(data = step1_2_3_sf_day1_training ,alpha = 0.09, color = "red") +
+  geom_sf(data = step1_2_3_sf_day1_Non_training ,alpha = 0.09, color = "black") +
   
   theme_bw()+
+  annotation_scale(pad_x = unit(1.8, "cm"),
+                   pad_y = unit(0.2, "cm"),
+                   width_hint = 0.3,
+                   height = unit(0.09, "cm")) +
+  
+  
+  annotation_north_arrow( pad_x = unit(2.8, "cm"),
+                          pad_y = unit(0.5, "cm"),
+                          height = unit(0.5, "cm"),
+                          width = unit(0.5, "cm"),
+                          which_north = "true",
+                          style = north_arrow_orienteering( text_size = 8))+
   facet_wrap(. ~ hours_format1, nrow=2)+
   theme(axis.ticks = element_blank(), axis.text.x = element_blank(), axis.text.y = element_blank())#+
 #labs(title = "Animal logs on first day")
@@ -252,14 +265,26 @@ step1_2_3_sf_day4$hours_format1 <-
 
 
 day4 <-ggplot() +
-  geom_sf(data = Lameroo_Vf_area_hard_fence_bound, color = "black", fill = NA) +
-  geom_sf(data = Lameroo_Vf_area, color = "black", fill = NA) +
-  geom_sf(data = Lameroo_Vf_area_hard_fence_bound_buff, color = "black",linetype = "dotted", size = 0.5, fill = NA) +
+  geom_sf(data = Lameroo_Vf_area, color = "red", fill = NA) +
+  geom_sf(data = Lameroo_Vf_area_hard_fence_bound, color = "black", fill = NA,  linewidth = 0.75) +
+  geom_sf(data = Lameroo_Vf_area_hard_fence_bound_buff, color = "black",linetype = "dotted", size = 0.8, fill = NA) +
   
   geom_sf(data = water_pt ,color ="Blue") +
   
   geom_sf(data = step1_2_3_sf_day4 ,alpha = 0.08) +
   theme_bw()+
+  annotation_scale(pad_x = unit(1.3, "cm"),
+                   pad_y = unit(0.2, "cm"),
+                   width_hint = 0.3,
+                   height = unit(0.09, "cm")) +
+  
+  
+  annotation_north_arrow( pad_x = unit(2.4, "cm"),
+                          pad_y = unit(0.5, "cm"),
+                          height = unit(0.5, "cm"),
+                          width = unit(0.5, "cm"),
+                          which_north = "true",
+                          style = north_arrow_orienteering( text_size = 8))+
   facet_wrap(.~ hours_format1,  nrow = 3)+
   theme(legend.position = "none",
         axis.ticks = element_blank(), axis.text.x = element_blank(), axis.text.y = element_blank())#+
