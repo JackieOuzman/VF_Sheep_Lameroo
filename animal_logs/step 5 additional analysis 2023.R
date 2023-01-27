@@ -262,7 +262,7 @@ step1_2_3_sf <- step1_2_3_sf %>%
   dplyr::mutate(spooking = 
                   case_when(
                     
-                    local_time > "2022-10-20 01:20:00" & local_time < "2022-10-20 09:00:00" ~ "spooking",
+                    local_time > "2022-10-20 01:00:00" & local_time < "2022-10-20 09:00:00" ~ "spooking",
                     TRUE                      ~ "regular"
                   ))
   
@@ -322,3 +322,186 @@ period <-ggplot() +
 period
 
 
+################################################################################
+### Cal the summary stats etc. cues by animal#################################################
+
+str(step1_2_3_sf)
+
+# step 1 summaries audio and pulse per animal per day also  period 
+summary_audio_ratio <- step1_2_3_sf %>% 
+  dplyr::group_by(Sheep_ID, date, period) %>% 
+  dplyr::summarise(audio = sum(Audio_values, na.rm = TRUE),
+                   pulse = sum(Shock_values, na.rm = TRUE),
+                   ratio_sum1 = audio_sum/ (pulse_sum+audio_sum )*100,
+                   ratio_sum2 = pulse_sum/ (audio_sum )*100,
+                   ratio_sum_D = ((audio_sum- pulse_sum)/audio_sum)*100)
+
+
+
+summary_audio_ratio$ratio_sum1 [is.nan(summary_audio_ratio$ratio_sum1 )]<-NA
+summary_audio_ratio$ratio_sum2 [is.nan(summary_audio_ratio$ratio_sum2 )]<-NA
+summary_audio_ratio$ratio_sum_D [is.nan(summary_audio_ratio$ratio_sum_D )]<-NA
+
+
+summary_audio_ratio <- ungroup(summary_audio_ratio)
+
+summary_audio_ratio
+
+
+
+
+summary_audio_ratio <- as.data.frame(summary_audio_ratio)
+summary_audio_ratio
+
+
+summary_audio_pulse <- summary_audio_ratio %>%dplyr::select(
+  date,
+  period,
+  Sheep_ID,
+  audio_sum  ,  
+  pulse_sum)   
+  
+
+summary_audio_pulse <- summary_audio_pulse %>%  dplyr::rename( audio = audio_sum,
+                                                               pulse = pulse_sum) 
+
+
+
+summary_audio_pulse <- summary_audio_pulse %>% arrange(date )
+
+
+summary_audio_pulse
+
+summary_audio_pulse <- summary_audio_pulse %>% 
+  dplyr::mutate(label = paste0(date ," ", period ))
+
+
+summary_audio_pulse
+
+
+summary_audio_pulse_long <- summary_audio_pulse %>% 
+  pivot_longer(
+    cols = c(audio   , pulse ),
+    names_to = "cue",
+    values_to = "value")
+summary_audio_pulse_long
+
+
+
+
+str(summary_audio_pulse_long)
+unique(summary_audio_pulse_long$label)
+summary_audio_pulse_long$Sheep_ID <- as.factor(summary_audio_pulse_long$Sheep_ID)
+
+
+
+
+summary_audio_pulse_long <- summary_audio_pulse_long %>% 
+  dplyr::mutate(label_v2 = case_when(
+    label == "2022-10-17 Training"        ~  "Day 1 training",
+    label == "2022-10-17 Trial"           ~ "Day 1 trial",
+    
+    label == "2022-10-18 Trial"           ~ "Day 2 trial",
+    label == "2022-10-19 Trial"           ~ "Day 3 trial",
+    label == "2022-10-20 Trial"           ~ "Day 4 trial",
+    label == "2022-10-20 Trial when spooked" ~ "Day 4 trial event",
+    label == "2022-10-21 Trial"          ~ "Day 5 trial",      
+        
+         
+  ))
+
+
+
+
+### option 1
+summary_audio_ratio_all_longplot_v1 <- summary_audio_pulse_long %>%
+  ggplot(aes(x = Sheep_ID, y = value, fill = cue)) +
+  geom_bar(position="stack", stat="identity")+
+  scale_fill_manual(values=c("grey55",
+                                     "grey80"))+
+                                       theme_classic() +
+  facet_wrap(.~ label_v2)+
+  theme(axis.text.x = element_text(angle = 90),
+        legend.position="bottom",
+        legend.title = element_blank(),
+        axis.title.x = element_blank())+
+  
+  labs(
+    y = "Count per day for animals ",
+    title = "",
+    subtitle = "")
+summary_audio_ratio_all_longplot_v1
+
+
+
+ggsave(summary_audio_ratio_all_longplot_v1,
+       device = "png",
+       filename = paste0("total_cues_per_day_animal_plot with spooking v1.png"),
+       path= "W:/VF/Sheep_Lameroo_2022/R_scripts/plots/",
+       width=8.62,
+       height = 6.28,
+       dpi=600
+)
+
+### option 2
+summary_audio_ratio_all_longplot_v2 <- summary_audio_pulse_long %>%
+  filter(label_v2 != "Day 4 trial event") %>% 
+  ggplot(aes(x = Sheep_ID, y = value, fill = cue)) +
+  geom_bar(position="stack", stat="identity")+
+  scale_fill_manual(values=c("grey55",
+                                     "grey80"))+
+                                       theme_classic() +
+  facet_wrap(.~ label_v2)+
+  theme(axis.text.x = element_text(angle = 90),
+        legend.position="bottom",
+        legend.title = element_blank(),
+        axis.title.x = element_blank())+
+  
+  labs(
+    y = "Count per day for animals ",
+    title = "",
+    subtitle = "")
+summary_audio_ratio_all_longplot_v2
+
+
+
+ggsave(summary_audio_ratio_all_longplot_v2,
+       device = "png",
+       filename = paste0("total_cues_per_day_animal_plot with spooking v2.png"),
+       path= "W:/VF/Sheep_Lameroo_2022/R_scripts/plots/",
+       width=8.62,
+       height = 6.28,
+       dpi=600
+)
+
+### option 3
+summary_audio_ratio_all_longplot_v3 <- summary_audio_pulse_long %>%
+  filter(label_v2 != "Day 4 trial event") %>% 
+  filter(label_v2 != "Day 1 training") %>% 
+  ggplot(aes(x = Sheep_ID, y = value, fill = cue)) +
+  geom_bar(position="stack", stat="identity")+
+  scale_fill_manual(values=c("grey55",
+                                     "grey80"))+
+                                       theme_classic() +
+  facet_wrap(.~ label_v2)+
+  theme(axis.text.x = element_text(angle = 90),
+        legend.position="bottom",
+        legend.title = element_blank(),
+        axis.title.x = element_blank())+
+  
+  labs(
+    y = "Count per day for animals ",
+    title = "",
+    subtitle = "")
+summary_audio_ratio_all_longplot_v3
+
+
+
+ggsave(summary_audio_ratio_all_longplot_v3,
+       device = "png",
+       filename = paste0("total_cues_per_day_animal_plot with spooking v3.png"),
+       path= "W:/VF/Sheep_Lameroo_2022/R_scripts/plots/",
+       width=8.62,
+       height = 6.28,
+       dpi=600
+)
