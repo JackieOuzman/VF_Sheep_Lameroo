@@ -330,8 +330,8 @@ str(step1_2_3_sf)
 # step 1 summaries audio and pulse per animal per day also  period 
 summary_audio_ratio <- step1_2_3_sf %>% 
   dplyr::group_by(Sheep_ID, date, period) %>% 
-  dplyr::summarise(audio = sum(Audio_values, na.rm = TRUE),
-                   pulse = sum(Shock_values, na.rm = TRUE),
+  dplyr::summarise(audio_sum = sum(Audio_values, na.rm = TRUE),
+                   pulse_sum = sum(Shock_values, na.rm = TRUE),
                    ratio_sum1 = audio_sum/ (pulse_sum+audio_sum )*100,
                    ratio_sum2 = pulse_sum/ (audio_sum )*100,
                    ratio_sum_D = ((audio_sum- pulse_sum)/audio_sum)*100)
@@ -404,7 +404,7 @@ summary_audio_pulse_long <- summary_audio_pulse_long %>%
     label == "2022-10-18 Trial"           ~ "Day 2 trial",
     label == "2022-10-19 Trial"           ~ "Day 3 trial",
     label == "2022-10-20 Trial"           ~ "Day 4 trial",
-    label == "2022-10-20 Trial when spooked" ~ "Day 4 trial event",
+    label == "2022-10-20 Trial when spooked" ~ "Day 4 trial incursion",
     label == "2022-10-21 Trial"          ~ "Day 5 trial",      
         
          
