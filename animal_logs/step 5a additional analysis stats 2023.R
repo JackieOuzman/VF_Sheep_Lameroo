@@ -130,7 +130,7 @@ sheep_9_t.test <- t.test(ratio_sum_D     ~ training_period, data = sheep_9, var.
 
 sheep_10 <- summary_audio_ratio_regular_only %>%  filter(Sheep_ID == "10") %>%   dplyr::select( Sheep_ID , ratio_sum_D ,training_period, date )
 sheep_10_t.test <- t.test(ratio_sum_D     ~ training_period, data = sheep_10, var.equal = TRUE)
-
+sheep_10_t.test
 
 df_results_t.test <- data.frame(
   sheep_ID=c(1,2,3,4,5,6,7,8,9,10),
@@ -177,6 +177,7 @@ df_results_t.test$ratio_training <- round(df_results_t.test$ratio_training, 2)
 
 
 df_results_t.test
+write.csv(df_results_t.test, "W:/VF/Sheep_Lameroo_2022/R_scripts/plots/Two_Sample_t_test_training_vs_trial_sheep.csv")
 
 ##############################################################################################
 ### t.test for for day 1?
