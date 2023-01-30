@@ -528,7 +528,7 @@ summary_stats <- summary_audio_pulse %>%
             std_dev_pulse = sd(pulse, na.rm = TRUE),
             
             ratio_D_av = mean(ratio_sum_D, na.rm = TRUE),
-            std_dev_pulse = sd(ratio_sum_D, na.rm = TRUE))
+            std_dev_ratio_D_av = sd(ratio_sum_D, na.rm = TRUE))
 
 summary_stats
 
@@ -550,8 +550,30 @@ summary_stats_period <- summary_audio_pulse %>%
             std_dev_pulse = sd(pulse, na.rm = TRUE),
             
             ratio_D_av = mean(ratio_sum_D, na.rm = TRUE),
-            std_dev_pulse = sd(ratio_sum_D, na.rm = TRUE))
+            std_dev_ratio_D = sd(ratio_sum_D, na.rm = TRUE))
 
 summary_stats_period
 
 write.csv(summary_stats_period,"C:/Users/ouz001/working_from_home_post_Sep2022/VF_Sheep_Lameroo/extra_for_paper2023/summary_cues_period_with_spooked_not_days.csv")
+
+
+################################################################################
+## summary stats on pulse audio and ratio for trial 
+
+
+summary_audio_pulse
+
+summary_stats_all_no_traning <- summary_audio_pulse %>% 
+  #filter(period != "Training") %>% 
+  summarise(audio_av = mean(audio, na.rm = TRUE),
+            std_dev_audio = sd(audio, na.rm = TRUE),
+            
+            pulse_av = mean(pulse, na.rm = TRUE),
+            std_dev_pulse = sd(pulse, na.rm = TRUE),
+            
+            ratio_D_av = mean(ratio_sum_D, na.rm = TRUE),
+            std_dev_ratio_D = sd(ratio_sum_D, na.rm = TRUE))
+
+summary_stats_all_no_traning
+
+write.csv(summary_stats_all_no_traning,"C:/Users/ouz001/working_from_home_post_Sep2022/VF_Sheep_Lameroo/extra_for_paper2023/summary_cues_stats_all_no_traning.csv")
