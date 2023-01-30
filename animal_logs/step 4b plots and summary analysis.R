@@ -158,13 +158,13 @@ day1 <- ggplot() +
   geom_sf(data = step1_2_3_sf_day1_Non_training ,alpha = 0.09, color = "black") +
   
   theme_bw()+
-  annotation_scale(pad_x = unit(1.8, "cm"),
+  annotation_scale(pad_x = unit(1.2, "cm"),
                    pad_y = unit(0.2, "cm"),
                    width_hint = 0.3,
                    height = unit(0.09, "cm")) +
   
   
-  annotation_north_arrow( pad_x = unit(2.8, "cm"),
+  annotation_north_arrow( pad_x = unit(2.4, "cm"),
                           pad_y = unit(0.5, "cm"),
                           height = unit(0.5, "cm"),
                           width = unit(0.5, "cm"),
@@ -273,13 +273,13 @@ day4 <-ggplot() +
   
   geom_sf(data = step1_2_3_sf_day4 ,alpha = 0.08) +
   theme_bw()+
-  annotation_scale(pad_x = unit(1.3, "cm"),
+  annotation_scale(pad_x = unit(1.0, "cm"),
                    pad_y = unit(0.2, "cm"),
                    width_hint = 0.3,
                    height = unit(0.09, "cm")) +
   
   
-  annotation_north_arrow( pad_x = unit(2.4, "cm"),
+  annotation_north_arrow( pad_x = unit(1.98, "cm"),
                           pad_y = unit(0.5, "cm"),
                           height = unit(0.5, "cm"),
                           width = unit(0.5, "cm"),

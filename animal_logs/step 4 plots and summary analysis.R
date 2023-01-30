@@ -295,13 +295,13 @@ plot1 <- ggplot() +
   facet_wrap(.~ Day_of_Trial)+
   theme_bw()+
   
-  annotation_scale(pad_x = unit(3.5, "cm"),
+  annotation_scale(pad_x = unit(2.5, "cm"),
                    pad_y = unit(0.2, "cm"),
                    width_hint = 0.3,
                    height = unit(0.09, "cm")) +
   
   
-  annotation_north_arrow( pad_x = unit(5.0, "cm"),
+  annotation_north_arrow( pad_x = unit(3.6, "cm"),
                           pad_y = unit(0.5, "cm"),
                           height = unit(0.5, "cm"),
                           width = unit(0.5, "cm"),
@@ -429,17 +429,30 @@ str(day_4_scare)
 
 
 day_4_scare_plot <- ggplot() +
-  geom_sf(data = Lameroo_Vf_area_hard_fence_bound, color = "black", fill = NA) +
-  geom_sf(data = Lameroo_Vf_area, color = "black", fill = NA) +
-  geom_sf(data = Lameroo_Vf_area_buffer_10, color = "black", fill = NA, linetype = "dashed", size = 0.5) +
+  geom_sf(data = Lameroo_Vf_area, color = "red", fill = NA) +
+  geom_sf(data = Lameroo_Vf_area_hard_fence_bound, color = "black", fill = NA,  linewidth = 0.75) +
+  geom_sf(data = Lameroo_Vf_area_hard_fence_bound_buff, color = "black", fill = NA, linetype = "dashed", size = 0.5) +
   geom_sf(data = water_pt ,color ="Blue") +
   
   geom_sf(data = day_4_scare_time ,alpha = 0.2) +
   facet_wrap( hours_format1 ~ min_format1  ,  nrow = 2)+
   
   theme_bw()+
+  
+  annotation_scale(pad_x = unit(1.6, "cm"),
+                   pad_y = unit(0.2, "cm"),
+                   width_hint = 0.3,
+                   height = unit(0.09, "cm")) +
+  
+  
+  annotation_north_arrow( pad_x = unit(2.85, "cm"),
+                          pad_y = unit(0.5, "cm"),
+                          height = unit(0.5, "cm"),
+                          width = unit(0.5, "cm"),
+                          which_north = "true",
+                          style = north_arrow_orienteering( text_size = 8))+
   theme(legend.position = "none",
-        axis.ticks = element_blank(), axis.text.x = element_blank(), axis.text.y = element_blank())#+
+        axis.ticks = element_blank(), axis.text.x = element_blank(), axis.text.y = element_blank())
 day_4_scare_plot
 
 
