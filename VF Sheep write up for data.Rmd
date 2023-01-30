@@ -642,6 +642,25 @@ summary_audio_ratio_df <- summary_audio_ratio_df %>%
 ```
 
 
+
+#### The data need to be divided up even more.
+There was a spooking event that should be removed from the dataset
+
+```{r cue plots summary table by day now with spooking event, echo=FALSE, message=FALSE, warning=FALSE}
+
+
+#################################################################################
+
+
+
+
+
+```
+
+
+
+
+
 ## GPS Plots
 
 AIM: Daily plots are probably sufficient. 
