@@ -514,6 +514,10 @@ ggsave(summary_audio_ratio_all_longplot_v3,
 
 
 summary_audio_pulse
+unique(summary_audio_pulse$label)
+summary_audio_pulse <- ungroup(summary_audio_pulse)
+
+summary_audio_pulse <- as.data.frame(summary_audio_pulse)
 
 summary_stats <- summary_audio_pulse %>% 
   dplyr::group_by(label) %>% 
