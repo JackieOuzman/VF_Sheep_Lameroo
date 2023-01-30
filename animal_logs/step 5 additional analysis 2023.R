@@ -510,7 +510,7 @@ ggsave(summary_audio_ratio_all_longplot_v3,
 
 
 ################################################################################
-## summary stats on pulse audio and ratio
+## summary stats on pulse audio and ratio for all days and all periods
 
 
 summary_audio_pulse
@@ -529,3 +529,25 @@ summary_stats <- summary_audio_pulse %>%
 summary_stats
 
 write.csv(summary_stats,"C:/Users/ouz001/working_from_home_post_Sep2022/VF_Sheep_Lameroo/extra_for_paper2023/summary_cues_period_with_spooked.csv")
+
+
+################################################################################
+## summary stats on pulse audio and ratio for all periods
+
+
+summary_audio_pulse
+
+summary_stats_period <- summary_audio_pulse %>% 
+  dplyr::group_by(period ) %>% 
+  summarise(audio_av = mean(audio, na.rm = TRUE),
+            std_dev_audio = sd(audio, na.rm = TRUE),
+            
+            pulse_av = mean(pulse, na.rm = TRUE),
+            std_dev_pulse = sd(pulse, na.rm = TRUE),
+            
+            ratio_D_av = mean(ratio_sum_D, na.rm = TRUE),
+            std_dev_pulse = sd(ratio_sum_D, na.rm = TRUE))
+
+summary_stats_period
+
+write.csv(summary_stats_period,"C:/Users/ouz001/working_from_home_post_Sep2022/VF_Sheep_Lameroo/extra_for_paper2023/summary_cues_period_with_spooked_not_days.csv")

@@ -646,13 +646,108 @@ summary_audio_ratio_df <- summary_audio_ratio_df %>%
 #### The data need to be divided up even more.
 There was a spooking event that should be removed from the dataset
 
+The below code should work but it dosnt - go figure??? step 5 has this code and it works!
+
 ```{r cue plots summary table by day now with spooking event, echo=FALSE, message=FALSE, warning=FALSE}
 
 
 #################################################################################
+#str(step1_2_3_sf)
+step1_2_3_sf <- step1_2_3_sf %>% 
+  dplyr::mutate(spooking = 
+                  case_when(
+                    
+                    local_time > "2022-10-20 01:00:00" & local_time < "2022-10-20 09:00:00" ~ "spooking",
+                    TRUE                      ~ "regular"
+                  ))
+  
+step1_2_3_sf <- step1_2_3_sf %>% 
+  dplyr::mutate(period = 
+                  case_when(
+                    spooking == "spooking" & training_period == "non_training" ~  "Trial when spooked",
+                    spooking == "spooking" & training_period == "training" ~      "Training when spooked",
+                    
+                    spooking == "regular" & training_period == "non_training" ~   "Trial",
+                    spooking == "regular" & training_period == "training" ~       "Training",
+                    TRUE                      ~ "check"
+                  ))
+
+
+summary_audio_ratio <- step1_2_3_sf %>% 
+  dplyr::group_by(Sheep_ID, date, period) %>% 
+  dplyr::summarise(audio_sum = sum(Audio_values, na.rm = TRUE),
+                   pulse_sum = sum(Shock_values, na.rm = TRUE),
+                   ratio_sum1 = audio_sum/ (pulse_sum+audio_sum )*100,
+                   ratio_sum2 = pulse_sum/ (audio_sum )*100,
+                   ratio_sum_D = ((audio_sum- pulse_sum)/audio_sum)*100)
 
 
 
+summary_audio_ratio$ratio_sum1 [is.nan(summary_audio_ratio$ratio_sum1 )]<-NA
+summary_audio_ratio$ratio_sum2 [is.nan(summary_audio_ratio$ratio_sum2 )]<-NA
+summary_audio_ratio$ratio_sum_D [is.nan(summary_audio_ratio$ratio_sum_D )]<-NA
+
+
+summary_audio_ratio <- ungroup(summary_audio_ratio)
+
+summary_audio_ratio <- as.data.frame(summary_audio_ratio)
+
+
+
+summary_audio_pulse <- summary_audio_ratio %>%dplyr::select(
+  date,
+  period,
+  Sheep_ID,
+  audio_sum  ,  
+  pulse_sum, ratio_sum_D)   
+  
+
+summary_audio_pulse <- summary_audio_pulse %>%  dplyr::rename( audio = audio_sum,
+                                                               pulse = pulse_sum) 
+
+
+
+summary_audio_pulse <- summary_audio_pulse %>% arrange(date )
+
+
+summary_audio_pulse <- summary_audio_pulse %>% 
+  dplyr::mutate(label = paste0(date ," ", period ))
+
+
+
+
+
+
+
+
+
+summary_stats <- summary_audio_pulse %>% 
+  dplyr::group_by(label) %>% 
+  summarise(audio_av = mean(audio, na.rm = TRUE),
+            std_dev_audio = sd(audio, na.rm = TRUE),
+            
+            pulse_av = mean(pulse, na.rm = TRUE),
+            std_dev_pulse = sd(pulse, na.rm = TRUE),
+            
+            ratio_D_av = mean(ratio_sum_D, na.rm = TRUE),
+            std_dev_pulse = sd(ratio_sum_D, na.rm = TRUE))
+
+summary_stats
+
+
+
+summary_stats_period <- summary_audio_pulse %>% 
+  dplyr::group_by(period ) %>% 
+  summarise(audio_av = mean(audio, na.rm = TRUE),
+            std_dev_audio = sd(audio, na.rm = TRUE),
+            
+            pulse_av = mean(pulse, na.rm = TRUE),
+            std_dev_pulse = sd(pulse, na.rm = TRUE),
+            
+            ratio_D_av = mean(ratio_sum_D, na.rm = TRUE),
+            std_dev_pulse = sd(ratio_sum_D, na.rm = TRUE))
+
+summary_stats_period
 
 
 ```
