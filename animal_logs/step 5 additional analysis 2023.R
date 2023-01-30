@@ -359,7 +359,7 @@ summary_audio_pulse <- summary_audio_ratio %>%dplyr::select(
   period,
   Sheep_ID,
   audio_sum  ,  
-  pulse_sum)   
+  pulse_sum, ratio_sum_D)   
   
 
 summary_audio_pulse <- summary_audio_pulse %>%  dplyr::rename( audio = audio_sum,
@@ -381,7 +381,7 @@ summary_audio_pulse
 
 summary_audio_pulse_long <- summary_audio_pulse %>% 
   pivot_longer(
-    cols = c(audio   , pulse ),
+    cols = c(audio   , pulse, ratio_sum_D ),
     names_to = "cue",
     values_to = "value")
 summary_audio_pulse_long
@@ -505,3 +505,27 @@ ggsave(summary_audio_ratio_all_longplot_v3,
        height = 6.28,
        dpi=600
 )
+
+
+
+
+################################################################################
+## summary stats on pulse audio and ratio
+
+
+summary_audio_pulse
+
+summary_stats <- summary_audio_pulse %>% 
+  dplyr::group_by(label) %>% 
+  summarise(audio_av = mean(audio, na.rm = TRUE),
+            std_dev_audio = sd(audio, na.rm = TRUE),
+            
+            pulse_av = mean(pulse, na.rm = TRUE),
+            std_dev_pulse = sd(pulse, na.rm = TRUE),
+            
+            ratio_D_av = mean(ratio_sum_D, na.rm = TRUE),
+            std_dev_pulse = sd(ratio_sum_D, na.rm = TRUE))
+
+summary_stats
+
+write.csv(summary_stats,"C:/Users/ouz001/working_from_home_post_Sep2022/VF_Sheep_Lameroo/extra_for_paper2023/summary_cues_period_with_spooked.csv")
